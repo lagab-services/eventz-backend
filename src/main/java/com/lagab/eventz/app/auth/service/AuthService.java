@@ -1,11 +1,14 @@
 package com.lagab.eventz.app.auth.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final JwtService jwtService;
 
     public AuthResponse login(LoginRequestDto request, String ipAddress, String userAgent) {
         try {
@@ -59,18 +63,21 @@ public class AuthService {
             }
 
             // Generate tokens
-            Token accessToken = tokenService.generateAccessToken(user, ipAddress, userAgent);
+            String accessTokenString = jwtService.generateAccessToken(
+                    user.getId(),
+                    Map.of("roles", List.of(user.getRole()))
+                    //Map.of("roles", user.getRoles().stream().map(role -> role.getName()).toList())
+            );
             Token refreshToken = tokenService.generateRefreshToken(user, ipAddress, userAgent,
                     request.rememberMe() != null && request.rememberMe());
 
             log.debug("Successful login for user: {}", user.getEmail());
 
             return new AuthResponse(
-                    accessToken.getToken(),
+                    accessTokenString,
                     refreshToken.getToken(),
                     "Bearer",
-                    accessToken.getExpiresAt().toEpochSecond(java.time.ZoneOffset.UTC) -
-                            java.time.LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC),
+                    jwtService.getAccessTokenValidityInMilliseconds(),
                     userMapper.toResponse(user)
             );
 
@@ -200,11 +207,16 @@ public class AuthService {
         return userMapper.toResponse(token.getUser());
     }
 
-    public void changePassword(String tokenValue, ChangePasswordRequest request) {
-        Token token = tokenService.findValidToken(tokenValue)
-                                  .orElseThrow(() -> new AuthenticationException("Invalid token"));
+    public UserResponse getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = (User) principal;
+        return userMapper.toResponse(currentUser);
+    }
 
-        User user = token.getUser();
+    public void changePassword(ChangePasswordRequest request) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = (User) principal;
 
         // Verify current password
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {

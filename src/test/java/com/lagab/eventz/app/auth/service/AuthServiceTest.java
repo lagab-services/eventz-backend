@@ -463,7 +463,7 @@ class AuthServiceTest {
             when(passwordEncoder.encode(rawNewPassword)).thenReturn(encodedNewPassword);
 
             // When
-            authService.changePassword(tokenValue, request);
+            authService.changePassword(request);
 
             // Then
             // Verify password encoder was called correctly
@@ -492,7 +492,7 @@ class AuthServiceTest {
 
             // When & Then
             ValidationException exception = assertThrows(ValidationException.class,
-                    () -> authService.changePassword(tokenValue, request));
+                    () -> authService.changePassword(request));
 
             assertEquals("Current password is incorrect", exception.getMessage());
         }

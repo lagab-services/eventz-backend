@@ -86,7 +86,8 @@ app:
     remember-me-expiration: 7776000    # 90 days
     email-verification-expiration: 86400 # 24 hours
     password-reset-expiration: 3600    # 1 hour
-
+    jwt-secret: "JmYR7kP5x4pdPc83IYz4rFjIl3YZ364n" # En production, utilisez une vraie clé secure !
+  
   frontend:
     url: ${FRONTEND_URL:http://localhost:3000}
   logo:

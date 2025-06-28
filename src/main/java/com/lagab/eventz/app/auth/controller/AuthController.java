@@ -83,9 +83,8 @@ public class AuthController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserResponse> getCurrentUser(HttpServletRequest request) {
-        String token = HttpUtil.extractTokenFromRequest(request);
-        UserResponse user = authService.getCurrentUser(token);
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        UserResponse user = authService.getCurrentUser();
         return ResponseEntity.ok(user);
     }
 
@@ -97,10 +96,8 @@ public class AuthController {
 
     @PostMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-            HttpServletRequest httpRequest) {
-        String token = HttpUtil.extractTokenFromRequest(httpRequest);
-        authService.changePassword(token, request);
+    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(request);
         return ResponseEntity.ok(new MessageResponse("Password changed successfully"));
     }
 
