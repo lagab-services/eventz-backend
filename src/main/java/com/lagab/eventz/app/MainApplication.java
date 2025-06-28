@@ -48,16 +48,14 @@ public class MainApplication {
         try {
             log.info("""
                             
-                            ----------------------------------------------------------
-                            	\
-                            Application '{}' is running! Access URLs:
-                            	\
-                            Local: 		http://localhost:{}
-                            	\
-                            External: 	http://{}:{}
-                            	\
-                            Profile(s): 	{}
-                            ----------------------------------------------------------\
+                            ╭──────────────────────────────────────────────────────────╮
+                            │                                                          │
+                               Application '{}' is running!                           
+                               Local:      http://localhost:{}                        
+                               External:   http://{}:{}                               
+                               Profile(s): {}                                         
+                            │                                                          │
+                            ╰──────────────────────────────────────────────────────────╯
                             """,
                     env.getProperty("spring.application.name"), env.getProperty("server.port", "8080"),
                     InetAddress.getLocalHost().getHostAddress(), env.getProperty("server.port", "8080"),

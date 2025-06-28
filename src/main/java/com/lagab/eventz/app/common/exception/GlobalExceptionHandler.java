@@ -10,9 +10,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.lagab.eventz.app.common.dto.MessageResponse;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
@@ -36,6 +38,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<MessageResponse> handleResourceNotFoundException(ResourceNotFoundException e) {
         log.error("Resource not found: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(new MessageResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<MessageResponse> handleEntityNotFound(EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(new MessageResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<MessageResponse> handleHandlerNotFound(NoHandlerFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(new MessageResponse(e.getMessage()));
     }

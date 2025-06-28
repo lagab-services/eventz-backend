@@ -17,16 +17,21 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
   jpa:
-    database: postgresql
-    open-in-view: false
     hibernate:
       ddl-auto: none
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    open-in-view: false
     properties:
-      hibernate.generate_statistics: false
+      hibernate.id.new_generator_mappings: true
       hibernate.jdbc.batch_size: 100
       hibernate.jdbc.batch_versioned_data: true
       hibernate.order_inserts: true
       hibernate.order_updates: true
+
+  web:
+    resources:
+      add-mappings: false
 
 # ===================================================================
 # Common properties
@@ -50,3 +55,4 @@ common:
     termsOfServiceUrl: ~
     title: "Backend API"
     version: #project.version#
+
