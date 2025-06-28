@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd" objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="1750976266471-1" author="lagab">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(255)"/>
+            <column name="locale" type="VARCHAR(10)"/>
+            <column name="is_active" type="BOOLEAN"/>
+            <column name="is_email_verified" type="BOOLEAN"/>
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1750976266471-2" author="lagab">
+        <addUniqueConstraint columnNames="email" constraintName="uc_users_email" tableName="users"/>
+    </changeSet>
+
+    <changeSet id="create-admin-user" author="lagab">
+        <insert tableName="users">
+            <column name="email" value="admin@example.com"/>
+            <column name="password"
+                    value="$2a$10$3N6XgDT6.30IRrc2fJOGoeu2tVuQ0eJbqDAfZG2C0CFdvYCEB5y86"/> <!-- Mot de passe crypté (ex: "admin123") -->
+            <column name="first_name" value="Admin"/>
+            <column name="last_name" value="System"/>
+            <column name="role" value="ADMIN"/>
+            <column name="locale" value="en-EN"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_email_verified" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <rollback>
+            <delete tableName="users">
+                <where>email = 'admin@example.com'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

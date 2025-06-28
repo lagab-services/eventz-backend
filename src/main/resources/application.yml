@@ -29,6 +29,28 @@ spring:
       hibernate.order_inserts: true
       hibernate.order_updates: true
 
+  mail:
+    host: ${SMTP_HOST:smtp.resend.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:resend}
+    password: ${RESEND_API_KEY}
+    from: ${MAIL_FROM_ADDRESS:noreply@yourdomain.com}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+  #i18n
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+    cache-duration: 3600
   web:
     resources:
       add-mappings: false
@@ -56,3 +78,16 @@ common:
     title: "Backend API"
     version: #project.version#
 
+app:
+  auth:
+    # tokens configuration
+    access-token-expiration: 3600      # 1 hour
+    refresh-token-expiration: 2592000  # 30 days
+    remember-me-expiration: 7776000    # 90 days
+    email-verification-expiration: 86400 # 24 hours
+    password-reset-expiration: 3600    # 1 hour
+
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:3000}
+  logo:
+    url: ${APP_LOGO_URL:http://localhost:8080/assets/logo.png}
