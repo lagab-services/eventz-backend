@@ -16,9 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.lagab.eventz.app.user.entity.Token;
-import com.lagab.eventz.app.user.entity.User;
-import com.lagab.eventz.app.user.repository.TokenRepository;
+import com.lagab.eventz.app.domain.auth.service.TokenService;
+import com.lagab.eventz.app.domain.user.model.Token;
+import com.lagab.eventz.app.domain.user.model.User;
+import com.lagab.eventz.app.domain.user.repository.TokenRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

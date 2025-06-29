@@ -16,7 +16,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.lagab.eventz.app.user.entity.User;
+import com.lagab.eventz.app.domain.auth.service.EmailService;
+import com.lagab.eventz.app.domain.user.model.User;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

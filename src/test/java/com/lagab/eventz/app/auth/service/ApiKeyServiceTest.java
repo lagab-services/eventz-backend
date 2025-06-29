@@ -14,9 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.lagab.eventz.app.auth.entity.ApiKey;
-import com.lagab.eventz.app.auth.repository.ApiKeyRepository;
-import com.lagab.eventz.app.user.entity.Role;
+import com.lagab.eventz.app.domain.auth.model.ApiKey;
+import com.lagab.eventz.app.domain.auth.repository.ApiKeyRepository;
+import com.lagab.eventz.app.domain.auth.service.ApiKeyService;
+import com.lagab.eventz.app.domain.user.model.Role;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
