@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.lagab.eventz.app.auth.dto.AuthResponse;
@@ -70,6 +71,12 @@ class AuthServiceTest {
     @Mock
     private Authentication authentication;
 
+    @Mock
+    private EmailService emailService;
+
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -115,10 +122,10 @@ class AuthServiceTest {
             String ipAddress = "192.168.1.1";
             String userAgent = "Mozilla/5.0";
 
+            when(jwtService.getAccessTokenValidityInMilliseconds()).thenReturn(360000L);
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenReturn(authentication);
             when(authentication.getPrincipal()).thenReturn(testUser);
-            when(tokenService.generateAccessToken(testUser, ipAddress, userAgent)).thenReturn(testAccessToken);
             when(tokenService.generateRefreshToken(testUser, ipAddress, userAgent, false)).thenReturn(testRefreshToken);
             when(userMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
@@ -127,14 +134,12 @@ class AuthServiceTest {
 
             // Then
             assertNotNull(response);
-            assertEquals("access-token", response.accessToken());
             assertEquals("refresh-token", response.refreshToken());
             assertEquals("Bearer", response.tokenType());
             assertEquals(testUserResponse, response.user());
             assertTrue(response.expiresIn() > 0);
 
             verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-            verify(tokenService).generateAccessToken(testUser, ipAddress, userAgent);
             verify(tokenService).generateRefreshToken(testUser, ipAddress, userAgent, false);
         }
 
@@ -149,7 +154,6 @@ class AuthServiceTest {
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenReturn(authentication);
             when(authentication.getPrincipal()).thenReturn(testUser);
-            when(tokenService.generateAccessToken(testUser, ipAddress, userAgent)).thenReturn(testAccessToken);
             when(tokenService.generateRefreshToken(testUser, ipAddress, userAgent, true)).thenReturn(testRefreshToken);
             when(userMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
@@ -450,7 +454,6 @@ class AuthServiceTest {
         @DisplayName("Should change password successfully")
         void shouldChangePasswordSuccessfully() {
             // Given
-            String tokenValue = "valid-token";
             String rawCurrentPassword = "currentPassword123";
             String rawNewPassword = "newPassword456";
             String encodedNewPassword = "encodedNewPassword";
@@ -458,7 +461,14 @@ class AuthServiceTest {
 
             ChangePasswordRequest request = new ChangePasswordRequest(rawCurrentPassword, rawNewPassword);
 
-            when(tokenService.findValidToken(tokenValue)).thenReturn(Optional.of(testAccessToken));
+            // Mock authentication
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    testUser,
+                    null,
+                    testUser.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             when(passwordEncoder.matches(rawCurrentPassword, testUser.getPassword())).thenReturn(true);
             when(passwordEncoder.encode(rawNewPassword)).thenReturn(encodedNewPassword);
 
@@ -484,10 +494,18 @@ class AuthServiceTest {
         @DisplayName("Should throw exception for incorrect current password")
         void shouldThrowExceptionForIncorrectCurrentPassword() {
             // Given
-            String tokenValue = "valid-token";
             ChangePasswordRequest request = new ChangePasswordRequest("wrong-password", "new-password");
+            User testUser = new User(); // or use your test user setup
+            testUser.setPassword("encoded-current-password");
 
-            when(tokenService.findValidToken(tokenValue)).thenReturn(Optional.of(testAccessToken));
+            // Mock authentication
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    testUser,
+                    null,
+                    testUser.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             when(passwordEncoder.matches(request.currentPassword(), testUser.getPassword())).thenReturn(false);
 
             // When & Then

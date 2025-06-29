@@ -27,23 +27,23 @@ public class TokenService {
     private final TokenRepository tokenRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    @Value("${app.auth.access-token-expiration:3600}") // 1 heure par défaut
+    @Value("${app.auth.access-token-expiration:3600}") // Default 1 hour
     private Long accessTokenExpiration;
 
-    @Value("${app.auth.refresh-token-expiration:2592000}") // 30 jours par défaut
+    @Value("${app.auth.refresh-token-expiration:2592000}") // Default 30 days
     private Long refreshTokenExpiration;
 
-    @Value("${app.auth.remember-me-expiration:7776000}") // 90 jours par défaut
+    @Value("${app.auth.remember-me-expiration:7776000}") // Default 90 days
     private Long rememberMeExpiration;
 
-    @Value("${app.auth.email-verification-expiration:86400}") // 24 heures par défaut
+    @Value("${app.auth.email-verification-expiration:86400}") // Default 24 hours
     private Long emailVerificationExpiration;
 
-    @Value("${app.auth.password-reset-expiration:3600}") // 1 heure par défaut
+    @Value("${app.auth.password-reset-expiration:3600}") // Default 1 hour
     private Long passwordResetExpiration;
 
     public Token generateAccessToken(User user, String ipAddress, String userAgent) {
-        // Révoquer les anciens access tokens
+        // Revoke old access tokens
         revokeTokensByType(user, Token.TokenType.ACCESS_TOKEN);
 
         String tokenValue = generateSecureToken();
@@ -77,7 +77,7 @@ public class TokenService {
     }
 
     public Token generateEmailVerificationToken(User user) {
-        // Revoque old verification token
+        // Revoke old verification token
         revokeTokensByType(user, Token.TokenType.EMAIL_VERIFICATION);
 
         String tokenValue = generateSecureToken();
@@ -93,7 +93,7 @@ public class TokenService {
     }
 
     public Token generatePasswordResetToken(User user) {
-        // Revoque old reset token
+        // Revoke old reset token
         revokeTokensByType(user, Token.TokenType.PASSWORD_RESET);
 
         String tokenValue = generateSecureToken();

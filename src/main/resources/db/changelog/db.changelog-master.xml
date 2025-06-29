@@ -6,4 +6,5 @@
 
     <include file="db/changelog/user/00000000000000_users_table.xml"/>
     <include file="db/changelog/user/00000000000001_tokens_table.xml"/>
+    <include file="db/changelog/user/00000000000003_apikeys.xml"/>
 </databaseChangeLog>
