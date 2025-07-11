@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd" objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1751535425367-1" author="lagab">
+        <createTable tableName="addresses">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_addresses"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="address1" type="VARCHAR(255)"/>
+            <column name="address2" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="state" type="VARCHAR(255)"/>
+            <column name="country" type="VARCHAR(255)"/>
+            <column name="zip_code" type="VARCHAR(255)"/>
+            <column name="latitude" type="DECIMAL(10,7)"/>
+            <column name="longitude" type="DECIMAL(10,7)"/>
+            <column name="is_online" type="BOOLEAN"/>
+            <column name="online_url" type="VARCHAR(255)"/>
+            <column name="event_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1751535425367-2" author="lagab">
+        <addUniqueConstraint columnNames="event_id" constraintName="uc_addresses_event" tableName="addresses"/>
+    </changeSet>
+    <changeSet id="1751535425367-3" author="lagab">
+        <addForeignKeyConstraint baseColumnNames="event_id" baseTableName="addresses" constraintName="FK_ADDRESSES_ON_EVENT"
+                                 referencedColumnNames="id" referencedTableName="events"/>
+    </changeSet>
+
+</databaseChangeLog>

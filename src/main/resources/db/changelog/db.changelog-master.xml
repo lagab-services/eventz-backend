@@ -7,4 +7,7 @@
     <include file="db/changelog/user/00000000000000_users_table.xml"/>
     <include file="db/changelog/user/00000000000001_tokens_table.xml"/>
     <include file="db/changelog/user/00000000000003_apikeys.xml"/>
+    <include file="db/changelog/event/00000000000004_event.xml"/>
+    <include file="db/changelog/event/00000000000005_address.xml"/>
+    <include file="db/changelog/event/00000000000006_ticket_types.xml"/>
 </databaseChangeLog>
