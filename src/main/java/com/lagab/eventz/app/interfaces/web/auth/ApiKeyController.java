@@ -20,6 +20,14 @@ import com.lagab.eventz.app.domain.user.model.Role;
 import com.lagab.eventz.app.interfaces.web.auth.dto.ApiKeyResponse;
 import com.lagab.eventz.app.interfaces.web.auth.dto.CreateApiKeyRequest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "API Key Management", description = "Endpoints for managing API keys. Requires ADMIN role.")
+@SecurityRequirement(name = "bearerAuth")
 public class ApiKeyController {
 
     private final ApiKeyService apiKeyService;
@@ -45,7 +55,38 @@ public class ApiKeyController {
      * @return ResponseEntity containing the created API key details (including the secret key)
      */
     @PostMapping
-    public ResponseEntity<ApiKeyResponse> createApiKey(@RequestBody @Valid CreateApiKeyRequest request) {
+    @Operation(
+            summary = "Create a new API key",
+            description = "Creates a new API key with specified name, client type, roles, and expiration date. Returns the API key with its secret value."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "API key created successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiKeyResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request parameters",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - Authentication required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - ADMIN role required",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<ApiKeyResponse> createApiKey(
+            @Parameter(description = "API key creation request", required = true)
+            @RequestBody @Valid CreateApiKeyRequest request) {
         Set<Role> roles = request.roles().stream()
                                  .map(Role::valueOf)
                                  .collect(Collectors.toSet());
@@ -68,13 +109,71 @@ public class ApiKeyController {
      * @return ResponseEntity with no content
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> revokeApiKey(@PathVariable Long id) {
+    @Operation(
+            summary = "Revoke an API key",
+            description = "Revokes an existing API key by its ID. The API key will no longer be valid for authentication."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "API key revoked successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - Authentication required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - ADMIN role required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "API key not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> revokeApiKey(
+            @Parameter(description = "ID of the API key to revoke", required = true, example = "1")
+            @PathVariable Long id) {
         apiKeyService.revokeApiKey(id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiKeyResponse> getApiKey(@PathVariable Long id) {
+    @Operation(
+            summary = "Get API key by ID",
+            description = "Retrieves a specific API key by its ID. The secret key value is not included in the response."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "API key found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiKeyResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - Authentication required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - ADMIN role required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "API key not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<ApiKeyResponse> getApiKey(
+            @Parameter(description = "ID of the API key to retrieve", required = true, example = "1")
+            @PathVariable Long id) {
         ApiKeyResponse apiKeyResponse = apiKeyService.getApikeyById(id);
         return ResponseEntity.ok(apiKeyResponse);
     }
@@ -85,6 +184,30 @@ public class ApiKeyController {
      * @return ResponseEntity containing a list of API key responses (without secret keys)
      */
     @GetMapping
+    @Operation(
+            summary = "Get all API keys",
+            description = "Retrieves all API keys in the system. Secret key values are not included in the response for security reasons."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of API keys retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiKeyResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - Authentication required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - ADMIN role required",
+                    content = @Content
+            )
+    })
     public ResponseEntity<List<ApiKeyResponse>> getAllApiKeys() {
         List<ApiKeyResponse> responses = apiKeyService.getApiKeysByType(null).stream()
                                                       .map(ApiKeyResponse::withoutKey)
@@ -100,7 +223,33 @@ public class ApiKeyController {
      * @return ResponseEntity containing a list of matching API key responses (without secret keys)
      */
     @GetMapping("/type/{clientType}")
-    public ResponseEntity<List<ApiKeyResponse>> getApiKeysByType(@PathVariable String clientType) {
+    @Operation(
+            summary = "Get API keys by client type",
+            description = "Retrieves API keys filtered by client type. Secret key values are not included in the response for security reasons."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of API keys for the specified client type retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiKeyResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - Authentication required",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - ADMIN role required",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<List<ApiKeyResponse>> getApiKeysByType(
+            @Parameter(description = "Client type to filter API keys", required = true, example = "WEB_CLIENT")
+            @PathVariable String clientType) {
         List<ApiKeyResponse> responses = apiKeyService.getApiKeysByType(clientType).stream()
                                                       .map(ApiKeyResponse::withoutKey)
                                                       .toList();

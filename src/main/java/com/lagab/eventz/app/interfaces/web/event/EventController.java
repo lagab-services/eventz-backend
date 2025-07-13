@@ -29,6 +29,11 @@ import com.lagab.eventz.app.domain.event.model.EventType;
 import com.lagab.eventz.app.domain.event.service.EventSearchService;
 import com.lagab.eventz.app.domain.event.service.EventService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,25 +42,34 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Events", description = "API for managing and searching events")
 public class EventController {
 
     private final EventService eventService;
     private final EventSearchService eventSearchService;
 
+    @Operation(summary = "Search events with filters",
+            description = "Search events with various filters including keyword, type, status, location and date range")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters provided")
+    })
     @GetMapping("")
     public ResponseEntity<PageResponse<EventSummaryDTO>> searchEvents(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) EventType type,
-            @RequestParam(required = false) EventStatus status,
-            @RequestParam(required = false) String city,
+            @Parameter(description = "Search keyword") @RequestParam(required = false) String keyword,
+            @Parameter(description = "Event type filter") @RequestParam(required = false) EventType type,
+            @Parameter(description = "Event status filter") @RequestParam(required = false) EventStatus status,
+            @Parameter(description = "City filter") @RequestParam(required = false) String city,
+            @Parameter(description = "Start date filter (ISO format)")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @Parameter(description = "End date filter (ISO format)")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam(required = false) Boolean isFree,
-            @RequestParam(required = false) Double latitude,
-            @RequestParam(required = false) Double longitude,
-            @RequestParam(required = false) Double radius,
-            @RequestParam(required = false) Long organizerId,
-            @PageableDefault(sort = "startDate") Pageable pageable) {
+            @Parameter(description = "Free events filter") @RequestParam(required = false) Boolean isFree,
+            @Parameter(description = "Latitude for location search") @RequestParam(required = false) Double latitude,
+            @Parameter(description = "Longitude for location search") @RequestParam(required = false) Double longitude,
+            @Parameter(description = "Radius in kilometers for location search") @RequestParam(required = false) Double radius,
+            @Parameter(description = "Organizer ID filter") @RequestParam(required = false) Long organizerId,
+            @Parameter(description = "Pagination and sorting parameters") @PageableDefault(sort = "startDate") Pageable pageable) {
 
         log.trace("GET /api/v1/events - Searching events with keyword: {}, type: {}, status: {}, city: {}",
                 keyword, type, status, city);
@@ -69,15 +83,25 @@ public class EventController {
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Get event by ID", description = "Retrieve detailed information about a specific event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved event"),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<EventDTO> getEventById(@PathVariable Long id) {
+    public ResponseEntity<EventDTO> getEventById(
+            @Parameter(description = "ID of the event to retrieve", required = true)
+            @PathVariable Long id) {
         log.trace("GET /api/v1/events/{} - Fetching event by ID", id);
         EventDTO event = eventService.getEventById(id);
         return ResponseEntity.ok(event);
     }
 
+    @Operation(summary = "Get upcoming events", description = "Retrieve a list of upcoming published events")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved upcoming events")
     @GetMapping("/upcoming")
     public ResponseEntity<PageResponse<EventSummaryDTO>> getUpcomingEvents(
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
         log.trace("GET /api/v1/events/upcoming - Fetching upcoming events");
 
@@ -90,8 +114,17 @@ public class EventController {
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Get upcoming events by organizer",
+            description = "Retrieve upcoming published events organized by a specific organizer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "404", description = "Organizer not found")
+    })
     @GetMapping("/upcoming/{organizerId}")
-    public ResponseEntity<PageResponse<EventSummaryDTO>> getUpcomingEventsByOrganizer(@PathVariable Long organizerId,
+    public ResponseEntity<PageResponse<EventSummaryDTO>> getUpcomingEventsByOrganizer(
+            @Parameter(description = "ID of the organizer", required = true)
+            @PathVariable Long organizerId,
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
         log.trace("GET /api/v1/events/organizer/{}/upcoming - Fetching upcoming events by organizer", organizerId);
 
@@ -100,17 +133,34 @@ public class EventController {
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Get events by organizer",
+            description = "Retrieve all events organized by a specific organizer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "404", description = "Organizer not found")
+    })
     @GetMapping("/organizer/{organizerId}")
-    public ResponseEntity<PageResponse<EventSummaryDTO>> getEventsByOrganizer(@PathVariable Long organizerId,
+    public ResponseEntity<PageResponse<EventSummaryDTO>> getEventsByOrganizer(
+            @Parameter(description = "ID of the organizer", required = true)
+            @PathVariable Long organizerId,
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
         log.trace("GET /api/v1/events/organizer/{} - Fetching events by organizer", organizerId);
         Page<EventSummaryDTO> events = eventSearchService.findEventsByOrganizer(organizerId, pageable);
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Advanced event search",
+            description = "Search events using comprehensive criteria in request body")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "400", description = "Invalid search criteria")
+    })
     @PostMapping("/search")
     public ResponseEntity<PageResponse<EventSummaryDTO>> searchEventsAdvanced(
+            @Parameter(description = "Search criteria object", required = true)
             @Valid @RequestBody EventSearchDTO searchDTO,
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
 
         log.trace("POST /api/v1/events/search - Advanced search with criteria: {}", searchDTO);
@@ -118,9 +168,17 @@ public class EventController {
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Get events by city",
+            description = "Retrieve published events in a specific city")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "400", description = "Invalid city parameter")
+    })
     @GetMapping("/city/{city}")
     public ResponseEntity<PageResponse<EventSummaryDTO>> getEventsByCity(
+            @Parameter(description = "City name to filter by", required = true)
             @PathVariable String city,
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
         log.trace("GET /api/v1/events/city/{} - Fetching events by city", city);
 
@@ -133,9 +191,17 @@ public class EventController {
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Get events by type",
+            description = "Retrieve published events of a specific type")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "400", description = "Invalid event type")
+    })
     @GetMapping("/type/{type}")
     public ResponseEntity<PageResponse<EventSummaryDTO>> getEventsByType(
+            @Parameter(description = "Event type to filter by", required = true)
             @PathVariable EventType type,
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
         log.trace("GET /api/v1/events/type/{} - Fetching events by type", type);
 
@@ -178,13 +244,25 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @Operation(summary = "Get nearby events",
+            description = "Retrieve published events near specified coordinates within given radius")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved events"),
+            @ApiResponse(responseCode = "400", description = "Invalid location parameters")
+    })
     @GetMapping("/nearby")
     public ResponseEntity<PageResponse<EventSummaryDTO>> getNearbyEvents(
+            @Parameter(description = "Latitude for location search", required = true)
             @RequestParam Double latitude,
+            @Parameter(description = "Longitude for location search", required = true)
             @RequestParam Double longitude,
+            @Parameter(description = "Search radius in kilometers", example = "10.0")
             @RequestParam(defaultValue = "10.0") Double radius,
+            @Parameter(description = "Optional event type filter")
             @RequestParam(required = false) EventType type,
+            @Parameter(description = "Optional free events filter")
             @RequestParam(required = false) Boolean isFree,
+            @Parameter(description = "Pagination and sorting parameters")
             @PageableDefault(sort = "startDate") Pageable pageable) {
 
         log.trace("GET /api/v1/events/nearby - Fetching events near lat: {}, lng: {}, radius: {}km",
@@ -214,24 +292,48 @@ public class EventController {
         return ResponseEntity.ok(PageResponse.of(events));
     }
 
+    @Operation(summary = "Count events by organizer",
+            description = "Get the count of events organized by a specific organizer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved count"),
+            @ApiResponse(responseCode = "404", description = "Organizer not found")
+    })
     @GetMapping("/organizer/{organizerId}/count")
-    public ResponseEntity<Long> countEventsByOrganizer(@PathVariable Long organizerId) {
+    public ResponseEntity<Long> countEventsByOrganizer(
+            @Parameter(description = "ID of the organizer", required = true)
+            @PathVariable Long organizerId) {
         log.trace("GET /api/v1/events/organizer/{}/count - Counting events by organizer", organizerId);
         long count = eventService.countEventsByOrganizer(organizerId);
         return ResponseEntity.ok(count);
     }
 
     // Endpoints de gestion des événements (CRUD)
+    @Operation(summary = "Create a new event", description = "Create a new event with the provided details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Event created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PostMapping
-    public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody CreateEventDTO createEventDTO) {
+    public ResponseEntity<EventDTO> createEvent(
+            @Parameter(description = "Event creation data", required = true)
+            @Valid @RequestBody CreateEventDTO createEventDTO) {
         log.trace("POST /api/v1/events - Creating new event: {}", createEventDTO.name());
         EventDTO createdEvent = eventService.createEvent(createEventDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
+    @Operation(summary = "Update an event", description = "Update an existing event with new information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<EventDTO> updateEvent(
+            @Parameter(description = "ID of the event to update", required = true)
             @PathVariable Long id,
+            @Parameter(description = "Updated event data", required = true)
             @Valid @RequestBody UpdateEventDTO updateEventDTO) {
 
         log.trace("PUT /api/v1/events/{} - Updating event", id);
@@ -239,22 +341,47 @@ public class EventController {
         return ResponseEntity.ok(updatedEvent);
     }
 
+    @Operation(summary = "Delete an event", description = "Delete an existing event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Event deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEvent(
+            @Parameter(description = "ID of the event to delete", required = true)
+            @PathVariable Long id) {
         log.trace("DELETE /api/v1/events/{} - Deleting event", id);
         eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Publish an event",
+            description = "Change an event's status to published")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event published successfully"),
+            @ApiResponse(responseCode = "404", description = "Event not found"),
+            @ApiResponse(responseCode = "409", description = "Event cannot be published")
+    })
     @PutMapping("/{id}/publish")
-    public ResponseEntity<EventDTO> publishEvent(@PathVariable Long id) {
+    public ResponseEntity<EventDTO> publishEvent(
+            @Parameter(description = "ID of the event to publish", required = true)
+            @PathVariable Long id) {
         log.trace("PUT /api/v1/events/{}/publish - Publishing event", id);
         EventDTO publishedEvent = eventService.publishEvent(id);
         return ResponseEntity.ok(publishedEvent);
     }
 
+    @Operation(summary = "Cancel an event",
+            description = "Change an event's status to cancelled")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event cancelled successfully"),
+            @ApiResponse(responseCode = "404", description = "Event not found"),
+            @ApiResponse(responseCode = "409", description = "Event cannot be cancelled")
+    })
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<EventDTO> cancelEvent(@PathVariable Long id) {
+    public ResponseEntity<EventDTO> cancelEvent(
+            @Parameter(description = "ID of the event to cancel", required = true)
+            @PathVariable Long id) {
 
         log.trace("PUT /api/v1/events/{}/cancel - Cancelling event", id);
         EventDTO cancelledEvent = eventService.cancelEvent(id);
