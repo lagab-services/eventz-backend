@@ -1,5 +1,6 @@
 package com.lagab.eventz.app.infrastructure.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,6 +35,9 @@ public class SecurityConfig {
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
     private final CommonProperties commonProperties;
 
+    @Value("${spring.profiles.active:}")
+    private String activeProfiles;
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -46,28 +50,38 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(userDetailsService)
-                .authorizeHttpRequests(authz -> authz
-                        // public endpoints
-                        .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/auth/refresh",
-                                "/api/auth/forgot-password",
-                                "/api/auth/reset-password",
-                                "/api/auth/verify-email",
-                                "/api/auth/resend-verification",
-                                "/h2-console/**",
-                                "/actuator/health"
-                        ).permitAll()
+                .authorizeHttpRequests(authz -> {
+                    authz
+                            // public endpoints
+                            .requestMatchers(
+                                    "/api/auth/login",
+                                    "/api/auth/register",
+                                    "/api/auth/refresh",
+                                    "/api/auth/forgot-password",
+                                    "/api/auth/reset-password",
+                                    "/api/auth/verify-email",
+                                    "/api/auth/resend-verification",
+                                    "/h2-console/**",
+                                    "/actuator/health"
+                            ).permitAll()
 
-                        // Specific endpoints requiring authentication
-                        .requestMatchers("/api/auth/**").authenticated()
-                        .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers("/api/moderator/**").hasAnyRole(Role.ADMIN.name(), Role.ORGANIZER.name())
+                            // Specific endpoints requiring authentication
+                            .requestMatchers("/api/auth/**").authenticated()
+                            .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
+                            .requestMatchers("/api/moderator/**").hasAnyRole(Role.ADMIN.name(), Role.ORGANIZER.name());
 
-                        // All other requests require authentication
-                        .anyRequest().authenticated()
-                )
+                    if (activeProfiles != null && activeProfiles.contains("swagger")) {
+                        authz.requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/api-docs/**"
+                        ).permitAll();
+                    }
+                    // All other requests require authentication
+                    authz.anyRequest().authenticated();
+
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

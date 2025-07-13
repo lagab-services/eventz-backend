@@ -55,6 +55,11 @@ spring:
     resources:
       add-mappings: false
 
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
 # ===================================================================
 # Common properties
 # ===================================================================
