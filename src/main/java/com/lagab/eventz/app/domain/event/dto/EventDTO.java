@@ -3,6 +3,7 @@ package com.lagab.eventz.app.domain.event.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
 

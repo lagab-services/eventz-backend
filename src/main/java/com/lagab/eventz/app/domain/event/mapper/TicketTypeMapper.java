@@ -12,11 +12,11 @@ import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-import com.lagab.eventz.app.domain.event.dto.TicketTypeDTO;
-import com.lagab.eventz.app.domain.event.dto.TicketTypeStatsDTO;
-import com.lagab.eventz.app.domain.event.dto.UpdateTicketTypeRequest;
+import com.lagab.eventz.app.domain.event.dto.ticket.CreateTicketTypeRequest;
+import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
+import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeStatsDTO;
+import com.lagab.eventz.app.domain.event.dto.ticket.UpdateTicketTypeRequest;
 import com.lagab.eventz.app.domain.event.projection.TicketTypeStatsProjection;
-import com.lagab.eventz.app.domain.ticket.dto.CreateTicketTypeRequest;
 import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 
 @Mapper(
@@ -37,14 +37,14 @@ public interface TicketTypeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "quantitySold", constant = "0")
     @Mapping(target = "event", ignore = true)
-    @Mapping(target = "orderItems", ignore = true)
+        //@Mapping(target = "orderItems", ignore = true)
     TicketType toEntity(CreateTicketTypeRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "quantitySold", ignore = true)
     @Mapping(target = "event", ignore = true)
-    @Mapping(target = "orderItems", ignore = true)
+        //@Mapping(target = "orderItems", ignore = true)
     void updateEntityFromDTO(UpdateTicketTypeRequest request, @MappingTarget TicketType ticketType);
 
     // Méthodes par défaut pour les calculs

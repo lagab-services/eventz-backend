@@ -16,6 +16,11 @@
             <column name="price" type="DECIMAL(10, 2)">
                 <constraints nullable="false"/>
             </column>
+            <column name="fee" type="DECIMAL(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT"/>
+            <column name="capacity" type="INT"/>
             <column name="quantity_available" type="INT"/>
             <column name="quantity_sold" type="INT"/>
             <column name="sale_start" type="DATETIME"/>

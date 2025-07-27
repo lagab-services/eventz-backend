@@ -1,6 +1,8 @@
 package com.lagab.eventz.app.domain.event.exception;
 
-public class AddressNotFoundException extends RuntimeException {
+import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
+
+public class AddressNotFoundException extends ResourceNotFoundException {
     public AddressNotFoundException(String message) {
         super(message);
     }

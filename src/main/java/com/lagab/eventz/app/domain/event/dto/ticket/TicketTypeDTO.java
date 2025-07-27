@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.domain.event.dto;
+package com.lagab.eventz.app.domain.event.dto.ticket;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,6 +1,8 @@
 package com.lagab.eventz.app.domain.event.exception;
 
-public class ReviewNotFoundException extends RuntimeException {
+import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
+
+public class ReviewNotFoundException extends ResourceNotFoundException {
     public ReviewNotFoundException(String message) {
         super(message);
     }
