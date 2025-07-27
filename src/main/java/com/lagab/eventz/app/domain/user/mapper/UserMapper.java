@@ -3,6 +3,7 @@ package com.lagab.eventz.app.domain.user.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.Named;
 
 import com.lagab.eventz.app.domain.auth.dto.RegisterRequest;
 import com.lagab.eventz.app.domain.auth.dto.UserResponse;
@@ -33,5 +34,14 @@ public interface UserMapper {
 
     default String mapRole(Role role) {
         return role != null ? role.name() : null;
+    }
+
+    @Named("mapUserFromId")
+    default User fromId(Long id) {
+        if (id == null)
+            return null;
+        User user = new User();
+        user.setId(id);
+        return user;
     }
 }

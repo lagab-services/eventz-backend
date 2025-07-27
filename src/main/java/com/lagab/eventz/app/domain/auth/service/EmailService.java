@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.lagab.eventz.app.domain.org.dto.OrganizationDto;
 import com.lagab.eventz.app.domain.user.model.User;
 
 import jakarta.mail.MessagingException;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * EmailService handles sending application emails including:
+ * EmailService handles sending application emails including :
  * - Account verification emails
  * - Password reset emails
  * - Localized email content based on user preferences
@@ -189,5 +190,49 @@ public class EmailService {
         helper.setText(content, false); // false indicates plain text
 
         mailSender.send(message);
+    }
+
+    /**
+     * Sends an organization invite email to a user
+     *
+     * @param organization The organization
+     * @param email        The invitee to send the email to
+     * @param token        Password reset token to include in the link
+     * @return CompletableFuture<Void>
+     */
+    @Async
+    public CompletableFuture<Void> sendOrganizationInvitation(OrganizationDto organization, User inviter, String token, String email) {
+        try {
+            Locale locale = createLocale(inviter.getLocale());
+            String acceptanceLink = String.format("%s/invitations/accept?token=%s", frontendUrl, token);
+
+            // Prepare template variables
+            Map<String, Object> templateModel = new HashMap<>();
+            templateModel.put("acceptanceLink", acceptanceLink);
+            templateModel.put("email", email);
+            templateModel.put("organization", organization);
+            templateModel.put("inviter", inviter.getFullName());
+            templateModel.put("logo", logoUrl);
+            templateModel.put("inviteeName", null);
+            templateModel.put("locale", locale.getLanguage());
+
+            // Create Thymeleaf context
+            Context context = new Context(locale, templateModel);
+
+            // Process email template
+            String htmlContent = templateEngine.process("emails/organization_invitation", context);
+
+            // Get localized subject
+            String subject = messageSource.getMessage("emails.organization_invitation.title", null, locale);
+
+            // Send email
+            sendHtmlEmail(email, subject, htmlContent);
+
+            log.debug("Invitation email sent successfully to: {}", email);
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception e) {
+            log.error("Failed to send invitation email to: {}", email, e);
+            return CompletableFuture.failedFuture(e);
+        }
     }
 }

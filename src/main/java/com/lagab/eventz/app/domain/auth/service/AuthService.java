@@ -13,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lagab.eventz.app.common.exception.AuthenticationException;
+import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
+import com.lagab.eventz.app.common.exception.ValidationException;
 import com.lagab.eventz.app.domain.auth.dto.AuthResponse;
 import com.lagab.eventz.app.domain.auth.dto.ChangePasswordRequest;
 import com.lagab.eventz.app.domain.auth.dto.ForgotPasswordRequest;
@@ -22,9 +25,8 @@ import com.lagab.eventz.app.domain.auth.dto.RegisterRequest;
 import com.lagab.eventz.app.domain.auth.dto.ResetPasswordRequest;
 import com.lagab.eventz.app.domain.auth.dto.TokenValidationResponse;
 import com.lagab.eventz.app.domain.auth.dto.UserResponse;
-import com.lagab.eventz.app.common.exception.AuthenticationException;
-import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
-import com.lagab.eventz.app.common.exception.ValidationException;
+import com.lagab.eventz.app.domain.org.dto.OrganizationDto;
+import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.mapper.UserMapper;
 import com.lagab.eventz.app.domain.user.model.Role;
 import com.lagab.eventz.app.domain.user.model.Token;
@@ -47,6 +49,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final JwtService jwtService;
+    private final OrganizationService organizationService;
 
     public AuthResponse login(LoginRequestDto request, String ipAddress, String userAgent) {
         try {
@@ -71,6 +74,7 @@ public class AuthService {
             Token refreshToken = tokenService.generateRefreshToken(user, ipAddress, userAgent,
                     request.rememberMe() != null && request.rememberMe());
 
+            List<OrganizationDto> organizations = organizationService.getUserOrganizations(user.getId());
             log.debug("Successful login for user: {}", user.getEmail());
 
             return new AuthResponse(
@@ -78,7 +82,8 @@ public class AuthService {
                     refreshToken.getToken(),
                     "Bearer",
                     jwtService.getAccessTokenValidityInMilliseconds(),
-                    userMapper.toResponse(user)
+                    userMapper.toResponse(user),
+                    organizations
             );
 
         } catch (BadCredentialsException e) {
@@ -111,6 +116,7 @@ public class AuthService {
         // In production, you might want to enforce email verification first
         Token accessToken = tokenService.generateAccessToken(user, null, null);
         Token refreshToken = tokenService.generateRefreshToken(user, null, null, false);
+        List<OrganizationDto> organizations = organizationService.getUserOrganizations(user.getId());
 
         return new AuthResponse(
                 accessToken.getToken(),
@@ -118,7 +124,8 @@ public class AuthService {
                 "Bearer",
                 accessToken.getExpiresAt().toEpochSecond(java.time.ZoneOffset.UTC) -
                         java.time.LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC),
-                userMapper.toResponse(user)
+                userMapper.toResponse(user),
+                organizations
         );
     }
 
@@ -140,6 +147,7 @@ public class AuthService {
         // Generate new tokens
         Token newAccessToken = tokenService.generateAccessToken(user, ipAddress, userAgent);
         Token newRefreshToken = tokenService.generateRefreshToken(user, ipAddress, userAgent, false);
+        List<OrganizationDto> organizations = organizationService.getUserOrganizations(user.getId());
 
         // Revoke the old refresh token
         tokenService.revokeToken(request.refreshToken());
@@ -152,7 +160,8 @@ public class AuthService {
                 "Bearer",
                 newAccessToken.getExpiresAt().toEpochSecond(java.time.ZoneOffset.UTC) -
                         java.time.LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC),
-                userMapper.toResponse(user)
+                userMapper.toResponse(user),
+                organizations
         );
     }
 
