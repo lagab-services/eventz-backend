@@ -10,4 +10,8 @@
     <include file="db/changelog/event/00000000000004_event.xml"/>
     <include file="db/changelog/event/00000000000005_address.xml"/>
     <include file="db/changelog/event/00000000000006_ticket_types.xml"/>
+    <include file="db/changelog/review/00000000000007_review.xml"/>
+    <include file="db/changelog/org/26-01-organization.xml"/>
+    <include file="db/changelog/org/26-01-organization-memberships.xml"/>
+    <include file="db/changelog/org/26-01-organization-invitations.xml"/>
 </databaseChangeLog>
