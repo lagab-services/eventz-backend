@@ -1,0 +1,3948 @@
+{
+	"info": {
+		"_postman_id": "93460fc3-c456-49c3-9ac6-abd67f4ecde5",
+		"name": "Tickets API",
+		"description": "Collection to test the organization management system inspired by Better Auth's Organization plugin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29842395"
+	},
+	"item": [
+		{
+			"name": "1. Authentication and User Management",
+			"item": [
+				{
+					"name": "1.1 Registration and Verification",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"first name\",\n  \"lastName\": \"Last Name\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Créer un nouveau compte utilisateur"
+							},
+							"response": []
+						},
+						{
+							"name": "Verify Email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"token\": \"verification-token-sent-by-email\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/verify-email",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"verify-email"
+									]
+								},
+								"description": "Se connecter avec un compte existant et récupérer un token JWT"
+							},
+							"response": []
+						},
+						{
+							"name": "Resend Verification Email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"test@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/resend-verification",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"resend-verification"
+									]
+								},
+								"description": "Se connecter avec un compte existant et récupérer un token JWT"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "1.2 Authentication",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.collectionVariables.set(\"auth_token\", jsonData.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Se connecter avec un compte existant et récupérer un token JWT"
+							},
+							"response": []
+						},
+						{
+							"name": "Login Admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.collectionVariables.set(\"auth_token\", jsonData.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Se connecter avec un compte existant et récupérer un token JWT"
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"logout"
+									]
+								},
+								"description": "Se déconnecter (révoquer le token)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "1.3 Password Management",
+					"item": [
+						{
+							"name": "Reset Password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\": \"NewSecurePassword456!\",\n    \"token\": \"verification-token-sent-by-email\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/reset-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"reset-password"
+									]
+								},
+								"description": "Se connecter avec un compte existant et récupérer un token JWT"
+							},
+							"response": []
+						},
+						{
+							"name": "Forgot Password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"test@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/forgot-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"forgot-password"
+									]
+								},
+								"description": "Se connecter avec un compte existant et récupérer un token JWT"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "1.4 Profile Management",
+					"item": [
+						{
+							"name": "Get user profile",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/auth/me",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"me"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						},
+						{
+							"name": "Check user profile Verified",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/auth/me/verified",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"me",
+										"verified"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						},
+						{
+							"name": "Edit user profile",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Ladislas\",\n    \"locale\": \"fr-FR\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/me",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"me"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						},
+						{
+							"name": "Change password",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"currentPassword\": \"password1234\",\n    \"password\": \"password123\",\n    \"passwordConfirmation\": \"password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/change-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"change-password"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						},
+						{
+							"name": "Edit user avatar",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/me/avatar",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"me",
+										"avatar"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user avatar",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/me/avatar",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"me",
+										"avatar"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user account",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\": \"SecurePassword123!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/me",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"me"
+									]
+								},
+								"description": "Récupérer toutes les playlists de l'utilisateur sur toutes les plateformes connectées"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "⏳1.5 Two-Factor Authentication",
+					"item": [
+						{
+							"name": "Enable 2FA",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"method\": \"TOTP\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/2fa/enable",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"2fa",
+										"enable"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Disable 2FA",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"code\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/2fa/disable",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"2fa",
+										"disable"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify 2FA Setup",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"code\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/2fa/verify",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"2fa",
+										"verify"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Backup Codes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/auth/2fa/backup-codes",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"2fa",
+										"backup-codes"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "Endpoints pour l'authentification utilisateur"
+		},
+		{
+			"name": "2. Organization Management",
+			"item": [
+				{
+					"name": "Create an organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('slug');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"organizationId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Organization\",\n    \"slug\": \"org-test\",\n    \"logo\": \"https://example.com/logo.png\",\n    \"metadata\": {\n        \"description\": \"Organization for testing\",\n        \"industry\": \"Technology\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations"
+							]
+						},
+						"description": "Create a new organization with a name, slug and optional logo"
+					},
+					"response": []
+				},
+				{
+					"name": "Update an organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('slug');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"organizationId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"logo\": \"https://example.com/logo.png\",\n    \"metadata\": {\n        \"description\": \"Organization for testing\",\n        \"industry\": \"Technology\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "7372350a-0695-4ee9-88a1-a3b793eaa8cd"
+								}
+							]
+						},
+						"description": "Create a new organization with a name, slug and optional logo"
+					},
+					"response": []
+				},
+				{
+					"name": "Update an organization with address",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('slug');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"organizationId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"logo\": \"https://example.com/logo.png\",\n    \"metadata\": {\n        \"description\": \"Organization for testing\",\n        \"industry\": \"Technology\",\n        \"address\": {\n            \"street\": \"123 Main Street\",\n            \"street2\": \"Apt 4B\",\n            \"city\": \"New York\",\n            \"state\": \"NY\",\n            \"postalCode\": \"10001\",\n            \"country\": \"United States\",\n            \"isPrimary\": true,\n            \"type\": \"billing2\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{organizationId}}"
+								}
+							]
+						},
+						"description": "Create a new organization with a name, slug and optional logo"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('slug');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"organizationId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/organizations/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{organizationId}}"
+								}
+							]
+						},
+						"description": "Create a new organization with a name, slug and optional logo"
+					},
+					"response": []
+				},
+				{
+					"name": "Check slug availability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains slug availability\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('available');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations/check-slug/org-test",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"check-slug",
+								"org-test"
+							]
+						},
+						"description": "Check if a slug is available before creating an organization"
+					},
+					"response": []
+				},
+				{
+					"name": "List user Organizations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains slug availability\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('available');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations"
+							]
+						},
+						"description": "Check if a slug is available before creating an organization"
+					},
+					"response": []
+				},
+				{
+					"name": "Get organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains slug availability\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('available');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{organizationId}}"
+								}
+							]
+						},
+						"description": "Check if a slug is available before creating an organization"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Organization Members Management",
+			"item": [
+				{
+					"name": "Invite member to organization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"contact.lagabservices@gmail.com\",\n    \"role\": \"MEMBER\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept  invitation request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/invitations/accept?token=591e61e4af0f3095af2738e680d024946f87f6bcb7207a42eb33a50b9b982d2f",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"invitations",
+								"accept"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "591e61e4af0f3095af2738e680d024946f87f6bcb7207a42eb33a50b9b982d2f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List organization members",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List organization invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/members/invitations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"members",
+								"invitations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update member role",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/members/{{memberId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"members",
+								"{{memberId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove member from organization",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/members/{{memberId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"members",
+								"{{memberId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "⏳4. Access Control",
+			"item": [
+				{
+					"name": "Check permissions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Correct permission response\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('hasPermission');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/permissions/check?resource=invitation&action=create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"permissions",
+								"check"
+							],
+							"query": [
+								{
+									"key": "resource",
+									"value": "invitation"
+								},
+								{
+									"key": "action",
+									"value": "create"
+								}
+							]
+						},
+						"description": "Check if the current user has a specific permission in the organization"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for permission management and access control"
+		},
+		{
+			"name": "⏳5. Team Management",
+			"item": [
+				{
+					"name": "Create a team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('organizationId');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"teamId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Development Team\",\n    \"description\": \"Team responsible for software development\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/teams",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"teams"
+							]
+						},
+						"description": "Create a new team within the organization"
+					},
+					"response": []
+				},
+				{
+					"name": "List teams",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains an array of teams\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    ",
+									"    if (jsonData.length > 0) {",
+									"        pm.expect(jsonData[0]).to.have.property('id');",
+									"        pm.expect(jsonData[0]).to.have.property('name');",
+									"        pm.expect(jsonData[0]).to.have.property('organizationId');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations/{{organizationId}}/teams",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"{{organizationId}}",
+								"teams"
+							]
+						},
+						"description": "Get a list of teams in an organization"
+					},
+					"response": []
+				},
+				{
+					"name": "Get a team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('organizationId');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teams/{{teamId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teams",
+								"{{teamId}}"
+							]
+						},
+						"description": "Get details of a specific team"
+					},
+					"response": []
+				},
+				{
+					"name": "Update a team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Update successful\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql(\"Frontend Development Team\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Frontend Development Team\",\n    \"description\": \"Team responsible for user interface development\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/teams/{{teamId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teams",
+								"{{teamId}}"
+							]
+						},
+						"description": "Update team information"
+					},
+					"response": []
+				},
+				{
+					"name": "Add a member to a team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Member addition successful\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success', true);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"memberId\": \"{{memberId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/teams/{{teamId}}/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teams",
+								"{{teamId}}",
+								"members"
+							]
+						},
+						"description": "Add an existing member to a team"
+					},
+					"response": []
+				},
+				{
+					"name": "List team members",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains an array of members\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    ",
+									"    if (jsonData.length > 0) {",
+									"        pm.expect(jsonData[0]).to.have.property('id');",
+									"        pm.expect(jsonData[0]).to.have.property('userId');",
+									"        pm.expect(jsonData[0]).to.have.property('role');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teams/{{teamId}}/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teams",
+								"{{teamId}}",
+								"members"
+							]
+						},
+						"description": "Get a list of members in a specific team"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove a member from a team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 204 No Content\", function() {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teams/{{teamId}}/members/{{memberId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teams",
+								"{{teamId}}",
+								"members",
+								"{{memberId}}"
+							]
+						},
+						"description": "Remove a member from a team"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 204 No Content\", function() {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/teams/{{teamId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"teams",
+								"{{teamId}}"
+							]
+						},
+						"description": "Completely delete a team"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for team management (optional feature)"
+		},
+		{
+			"name": "6. OAuth Management",
+			"item": [
+				{
+					"name": "Get Linked Accounts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/accounts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get OAuth Redirect URL",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/:provider/redirect",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								":provider",
+								"redirect"
+							],
+							"variable": [
+								{
+									"key": "provider",
+									"value": "google"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OAuth Callback",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/:provider/callback?code=4%2F0Ab_5qllwOLFGNRAqFIM0P3U8Jhn61rQQghCpsJi3YwwiHzcLkhOXFakFzi5VkGrZIJcuiA&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&prompt=consent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								":provider",
+								"callback"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "4%2F0Ab_5qllwOLFGNRAqFIM0P3U8Jhn61rQQghCpsJi3YwwiHzcLkhOXFakFzi5VkGrZIJcuiA"
+								},
+								{
+									"key": "scope",
+									"value": "email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email"
+								},
+								{
+									"key": "authuser",
+									"value": "0"
+								},
+								{
+									"key": "prompt",
+									"value": "consent"
+								}
+							],
+							"variable": [
+								{
+									"key": "provider",
+									"value": "google"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Link OAuth Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"provider\": \"google\",\n  \"access_token\": \"oauth-access-token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/connect",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"connect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sync User Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": {\n        \"email\": \"test@example.com\",\n        \"name\": \"user.name\"\n    },\n    \"account\": {\n        \"provider\": \"{{provider}}\",\n        \"providerId\": \"providerId\",\n        \"accessToken\": \"account!.access_token\",\n        \"refreshToken\": \"account!.refresh_token\",\n        \"expiresAt\": \"5\",\n        \"refreshTokenExpiresIn\":\"\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/sync",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"sync"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unlink OAuth Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/accounts/{{provider}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"accounts",
+								"{{provider}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Customer Management",
+			"item": [
+				{
+					"name": "Validation Tests",
+					"item": [
+						{
+							"name": "Invalid Create - Bad Email",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"not-an-email\",\n    \"address\": {\n        \"street\": \"123 Main St\",\n        \"city\": \"New York\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/customers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid Create - Missing Required Fields",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"J\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/customers",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid Update - Bad Phone Number",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"phone\": \"123\",\n    \"address\": {\n        \"postalCode\": \"not-a-zip\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/customers/{{customerId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"customers",
+										"{{customerId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List All Customers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "john",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Customer (Full Address)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"customerId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+14155552671\",\n    \"address\": {\n        \"street\": \"123 Main Street\",\n        \"street2\": \"Apt 4B\",\n        \"city\": \"New York\",\n        \"state\": \"NY\",\n        \"postalCode\": \"10001\",\n        \"country\": \"United States\",\n        \"isPrimary\": true,\n        \"type\": \"billing\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/customers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customers/{{customerId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Customer (Partial Address Update)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe Jr.\",\n    \"address\": {\n        \"street\": \"456 Broadway\",\n        \"city\": \"New York\",\n        \"postalCode\": \"10007\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/{{customerId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customers/{{customerId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8. Event Management",
+			"item": [
+				{
+					"name": "8.1 Ticket Type Management",
+					"item": [
+						{
+							"name": "Check Availability",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/:id/availability?quantity=5",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										":id",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "quantity",
+											"value": "5"
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Event Ticket Type Stats",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:enventId/stats",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":enventId",
+										"stats"
+									],
+									"variable": [
+										{
+											"key": "enventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Ticket Types By Event ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Active Ticket Types By Event ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/active",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"active"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get On Sale Ticket Types By Event ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/on-sale",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"on-sale"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Ticket Type By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Ticket Type",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status 201 Created\", function() {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Correct response structure\", function() {",
+											"    pm.expect(jsonData).to.have.property('id');",
+											"    pm.expect(jsonData).to.have.property('title');",
+											"    pm.expect(jsonData).to.have.property('createdAt');",
+											"});",
+											"",
+											"if (jsonData && jsonData.id) {",
+											"    pm.collectionVariables.set(\"ticketTypeId\", jsonData.id);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Standard Ticket\",\n  \"description\": \"Ticket d'entrée standard\",\n  \"price\": 25.00,\n  \"quantityAvailable\":200,\n  \"maxQuantity\": 100,\n  \"saleStartDate\": \"2024-01-15T10:00:00\",\n  \"saleEndDate\": \"2024-03-15T23:59:59\",\n  \"active\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Bulk Ticket Types",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status 201 Created\", function() {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Correct response structure\", function() {",
+											"    pm.expect(jsonData).to.have.property('id');",
+											"    pm.expect(jsonData).to.have.property('title');",
+											"    pm.expect(jsonData).to.have.property('createdAt');",
+											"});",
+											"",
+											"if (jsonData && jsonData.id) {",
+											"    pm.collectionVariables.set(\"eventId\", jsonData.id);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n    {\n        \"name\": \"VIP Ticket\",\n        \"description\": \"Ticket VIP avec accès privilégié\",\n        \"price\": 75.00,\n        \"maxQuantity\": 20,\n        \"saleStartDate\": \"2024-01-15T10:00:00\",\n        \"saleEndDate\": \"2024-03-15T23:59:59\",\n        \"active\": true\n    },\n    {\n        \"name\": \"Student Ticket\",\n        \"description\": \"Ticket étudiant à tarif réduit\",\n        \"price\": 15.00,\n        \"maxQuantity\": 50,\n        \"saleStartDate\": \"2024-01-15T10:00:00\",\n        \"saleEndDate\": \"2024-03-15T23:59:59\",\n        \"active\": true\n    }\n]"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/bulk?eventId={{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"bulk"
+									],
+									"query": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Ticket type",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Premium Ticket\",\n  \"description\": \"Ticket premium avec avantages exclusifs\",\n  \"price\": 35.00,\n  \"maxQuantity\": 80,\n  \"saleStartDate\": \"2024-01-15T10:00:00\",\n  \"saleEndDate\": \"2024-03-15T23:59:59\",\n  \"active\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle  ticket type status",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/:id/toggle-active",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										":id",
+										"toggle-active"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reorder Ticket Types",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[4, 3, 2]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/reorder",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"reorder"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Ticket Type",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Search events (GET)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/events?keyword=&type=&status=&city=&startDate&endDate&isFree&latitude&longitude&radius",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"events"
+							],
+							"query": [
+								{
+									"key": "keyword",
+									"value": ""
+								},
+								{
+									"key": "type",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "city",
+									"value": ""
+								},
+								{
+									"key": "startDate",
+									"value": null
+								},
+								{
+									"key": "endDate",
+									"value": null
+								},
+								{
+									"key": "isFree",
+									"value": null
+								},
+								{
+									"key": "latitude",
+									"value": null
+								},
+								{
+									"key": "longitude",
+									"value": null
+								},
+								{
+									"key": "radius",
+									"value": null
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Advanced search events (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"keyword\": \"\",\n  \"type\": \"\",\n  \"status\": \"\",\n  \"city\": \"\",\n  \"startDate\": \"2025-06-10T00:00:00\",\n  \"isFree\": null,\n  \"latitude\": null,\n  \"longitude\": null,\n  \"radius\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url_version}}/events/search",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List upcoming events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_version}}/events/upcoming?page=1&size=20",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								"upcoming"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get events by organizer",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_version}}/events/organizer/:organizerId",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								"organizer",
+								":organizerId"
+							],
+							"variable": [
+								{
+									"key": "organizerId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_version}}/events/:id",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{eventId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('title');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"eventId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Soirée Networking Lille - Édition Spéciale\",\n    \"description\": \"Un événement exceptionnel pour les pros du digital.\",\n    \"summary\": \"Networking + Conférences\",\n    \"startDate\": \"2025-07-14T18:00:00\",\n    \"endDate\": \"2025-08-01T23:59:00\",\n    \"registrationStart\": \"2025-07-01T00:00:00\",\n    \"registrationEnd\": \"2025-07-31T23:59:59\",\n    \"status\": \"DRAFT\",\n    \"type\": \"FESTIVAL\",\n    \"imageUrl\": \"https://example.com/newimage.png\",\n    \"website\": \"https://www.monevent.fr\",\n    \"maxAttendees\": 200,\n    \"isPublic\": true,\n    \"isFree\": true,\n    \"currency\": \"EUR\",\n    \"address\": {\n        \"address1\": \"456 Avenue des Champs\",\n        \"city\": \"Lille\",\n        \"postalCode\": \"59000\",\n        \"country\": \"France\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/events",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Event",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Event\",\n  \"description\": \"Updated description\",\n  \"startDate\": \"2025-07-16T18:00:00\",\n  \"endDate\": \"2025-07-16T21:00:00\",\n  \"location\": \"Lyon\",\n  \"type\": \"WORKSHOP\",\n  \"isFree\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url_version}}/events/:id",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{eventId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish event",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_version}}/events/:id/publish",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								":id",
+								"publish"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{eventId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel event",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_version}}/events/:id/cancel",
+							"host": [
+								"{{base_url_version}}"
+							],
+							"path": [
+								"events",
+								":id",
+								"cancel"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{eventId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/event/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"event",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{eventId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "9. Invoice Management",
+			"item": [
+				{
+					"name": "List Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invoices?status=draft",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "draft"
+								},
+								{
+									"key": "customerId",
+									"value": "{{customerId}}",
+									"disabled": true
+								},
+								{
+									"key": "fromDate",
+									"value": "2023-01-01",
+									"disabled": true
+								},
+								{
+									"key": "toDate",
+									"value": "2023-12-31",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lister les factures avec filtres optionnels"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Invoice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status 201 Created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Correct response structure\", function() {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('title');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set(\"invoiceId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"organizationId\": \"{{organizationId}}\",\n  \"customerId\": \"{{customerId}}\",\n  \"issueDate\": \"2023-12-01\",\n  \"dueDate\": \"2023-12-31\",\n  \"status\": \"draft\",\n  \"title\": \"Facture test 2\",\n  \"notes\": \"Facture pour services rendus\",\n  \"totalAmount\": 0,\n  \"items\": [\n    {\n      \"label\": \"Service Consulting\",\n      \"description\": \"Consulting services for project X\",\n      \"quantity\": 5,\n      \"unitPrice\": 120,\n      \"taxRate\": 20\n    },\n    {\n      \"label\": \"Software License\",\n      \"quantity\": 1,\n      \"unitPrice\": 500,\n      \"taxRate\": 10\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/invoices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices"
+							]
+						},
+						"description": "Créer une nouvelle facture avec des articles"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invoice",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}"
+							]
+						},
+						"description": "Récupérer une facture spécifique avec tous ses détails"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Invoice",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dueDate\": \"2024-01-15\",\n  \"notes\": \"Facture mise à jour avec nouveau délai\",\n  \"items\": [\n    {\n      \"label\": \"Service Consulting\",\n      \"quantity\": 8,\n      \"unitPrice\": 120,\n      \"taxRate\": 20\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}"
+							]
+						},
+						"description": "Mettre à jour une facture existante"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Invoice",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}"
+							]
+						},
+						"description": "Supprimer une facture (uniquement si statut 'draft')"
+					},
+					"response": []
+				},
+				{
+					"name": "Send Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}/send",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}",
+								"send"
+							]
+						},
+						"description": "Envoyer une facture (change le statut de 'draft' à 'open')"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Invoice as Paid",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paymentDate\": \"2023-12-15\",\n  \"paymentMethod\": \"bank_transfer\",\n  \"reference\": \"TRANSACTION-12345\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}/mark-paid",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}",
+								"mark-paid"
+							]
+						},
+						"description": "Marquer une facture comme payée"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Invoice Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"cancelled\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}",
+								"status"
+							]
+						},
+						"description": "Changer le statut d'une facture"
+					},
+					"response": []
+				},
+				{
+					"name": "Recalculate Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}/recalculate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}",
+								"recalculate"
+							]
+						},
+						"description": "Recalculer le montant total d'une facture"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Invoice PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invoices/{{invoiceId}}/download",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"invoices",
+								"{{invoiceId}}",
+								"download"
+							]
+						},
+						"description": "Télécharger le PDF d'une facture"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "9. API Keys Management",
+			"item": [
+				{
+					"name": "Create API Key",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"My New Key\",\n    \"clientType\": \"SERVICE\",\n    \"roles\": [\n        \"USER\",\n        \"ADMIN\"\n    ],\n    \"expiresAt\": \"2025-12-31T23:59:59\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/apikeys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"apikeys"
+							]
+						},
+						"description": "Create a new API key with name, client type, roles and optional expiration date"
+					},
+					"response": []
+				},
+				{
+					"name": "List API Keys",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/apikeys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"apikeys"
+							]
+						},
+						"description": "Retrieve all API keys"
+					},
+					"response": []
+				},
+				{
+					"name": "List API Keys By type",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/apikeys/type/SERVICE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"apikeys",
+								"type",
+								"SERVICE"
+							]
+						},
+						"description": "Retrieve all API keys"
+					},
+					"response": []
+				},
+				{
+					"name": "Get API Key by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/apikeys/{{apiKeyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"apikeys",
+								"{{apiKeyId}}"
+							]
+						},
+						"description": "Retrieve a specific API key by its ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete API Key",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/apikeys/{{apiKeyId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"apikeys",
+								"{{apiKeyId}}"
+							]
+						},
+						"description": "Delete a specific API key by its ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints to manage API keys (create, list, get by id, delete)."
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "your-bearer-token",
+			"type": "string"
+		},
+		{
+			"key": "organizationId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "invitationId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "memberId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "teamId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "provider",
+			"value": "google",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "quoteId",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "invoiceId",
+			"value": "69d8957f-4e0d-4dc1-a695-68edfa5dcae2",
+			"type": "default"
+		},
+		{
+			"key": "eventId",
+			"value": ""
+		},
+		{
+			"key": "api_version",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url_version",
+			"value": "{{base_url}}{{api_version}}",
+			"type": "string"
+		},
+		{
+			"key": "ticketTypeId",
+			"value": ""
+		}
+	]
+}

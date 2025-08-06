@@ -18,6 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.lagab.eventz.app.common.exception.AuthenticationException;
+import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
+import com.lagab.eventz.app.common.exception.ValidationException;
 import com.lagab.eventz.app.domain.auth.dto.AuthResponse;
 import com.lagab.eventz.app.domain.auth.dto.ChangePasswordRequest;
 import com.lagab.eventz.app.domain.auth.dto.ForgotPasswordRequest;
@@ -27,13 +30,11 @@ import com.lagab.eventz.app.domain.auth.dto.RegisterRequest;
 import com.lagab.eventz.app.domain.auth.dto.ResetPasswordRequest;
 import com.lagab.eventz.app.domain.auth.dto.TokenValidationResponse;
 import com.lagab.eventz.app.domain.auth.dto.UserResponse;
-import com.lagab.eventz.app.common.exception.AuthenticationException;
-import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
-import com.lagab.eventz.app.common.exception.ValidationException;
 import com.lagab.eventz.app.domain.auth.service.AuthService;
 import com.lagab.eventz.app.domain.auth.service.EmailService;
 import com.lagab.eventz.app.domain.auth.service.JwtService;
 import com.lagab.eventz.app.domain.auth.service.TokenService;
+import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.mapper.UserMapper;
 import com.lagab.eventz.app.domain.user.model.Role;
 import com.lagab.eventz.app.domain.user.model.Token;
@@ -74,6 +75,9 @@ class AuthServiceTest {
 
     @Mock
     private Authentication authentication;
+
+    @Mock
+    private OrganizationService organizationService;
 
     @Mock
     private EmailService emailService;

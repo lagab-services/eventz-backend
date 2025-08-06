@@ -114,16 +114,11 @@ public class OrganizationSecurityService {
      * @return true if the user can manage roles
      */
     public boolean canManageMembers(Long userId, String organizationId) {
-        if (!isAdmin(userId, organizationId)) {
-            return false;
-        }
-
-        // An owner can manage all members
-        if (isOwner(userId, organizationId)) {
+        if (isAdmin(userId, organizationId) || isOwner(userId, organizationId)) {
             return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
