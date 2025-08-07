@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lagab.eventz.app.domain.org.dto.InvitationResponseDto;
-import com.lagab.eventz.app.domain.org.dto.MembershipInviteDto;
 import com.lagab.eventz.app.domain.org.dto.OrganizationMembershipDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.InvitationResponseDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.MembershipInviteDto;
 import com.lagab.eventz.app.domain.org.service.OrganizationMembershipService;
 import com.lagab.eventz.app.domain.user.model.User;
+import com.lagab.eventz.app.interfaces.web.org.annotation.RequireOrganizationPermission;
 import com.lagab.eventz.app.interfaces.web.org.dto.UpdateMemberRoleRequestDto;
 import com.lagab.eventz.app.util.SecurityUtils;
 
@@ -46,7 +46,7 @@ public class OrganizationMembersController {
      * @return Created membership response
      */
     @PostMapping
-    @PreAuthorize("@organizationSecurityService.canInviteMembers(authentication.principal.id, #organizationId)")
+    @RequireOrganizationPermission(permission = "MEMBER_INVITE")
     public ResponseEntity<OrganizationMembershipDto> invite(
             @PathVariable String organizationId,
             @Valid @RequestBody MembershipInviteDto request) {
@@ -69,6 +69,7 @@ public class OrganizationMembersController {
      * @return List of organization members
      */
     @GetMapping
+    @RequireOrganizationPermission(permission = "MEMBER_VIEW")
     public ResponseEntity<List<OrganizationMembershipDto>> listAllMembers(@PathVariable String organizationId) {
 
         Long userId = SecurityUtils.getCurrentUserId();
@@ -89,7 +90,7 @@ public class OrganizationMembersController {
      * @return Updated membership response
      */
     @PatchMapping("/{memberId}")
-    @PreAuthorize("@organizationSecurityService.canManageMembers(authentication.principal.id, #organizationId)")
+    @RequireOrganizationPermission(permission = "MEMBER_VIEW")
     public ResponseEntity<OrganizationMembershipDto> updateRole(
             @PathVariable String organizationId,
             @PathVariable Long memberId,
@@ -112,7 +113,7 @@ public class OrganizationMembersController {
      * @return Empty response
      */
     @DeleteMapping("/{memberId}")
-    @PreAuthorize("@organizationSecurityService.canRemoveMember(authentication.principal.id, #organizationId, @organizationMembershipService.getUserIdByMembership(#memberId))")
+    @RequireOrganizationPermission(permission = "MEMBER_REMOVE")
     public ResponseEntity<Void> remove(@PathVariable String organizationId, @PathVariable Long memberId) {
 
         Long userId = SecurityUtils.getCurrentUserId();
@@ -149,7 +150,7 @@ public class OrganizationMembersController {
      * @return List of pending invitations
      */
     @GetMapping("/invitations")
-    @PreAuthorize("@organizationSecurityService.canInviteMembers(authentication.principal.id, #organizationId)")
+    @RequireOrganizationPermission(permission = "MEMBER_INVITE")
     public ResponseEntity<List<InvitationResponseDto>> listPendingInvitations(@PathVariable String organizationId) {
 
         Long userId = SecurityUtils.getCurrentUserId();

@@ -8,15 +8,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.lagab.eventz.app.domain.org.model.OrganizationPermission;
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 import com.lagab.eventz.app.domain.org.service.OrganizationMembershipService;
+import com.lagab.eventz.app.domain.org.service.OrganizationPermissionService;
 import com.lagab.eventz.app.domain.org.service.OrganizationSecurityService;
 import com.lagab.eventz.app.domain.org.service.OrganizationService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +29,9 @@ class OrganizationSecurityServiceTest {
 
     @Mock
     private OrganizationMembershipService organizationMembershipService;
+
+    @Mock
+    private OrganizationPermissionService permissionService;
 
     @InjectMocks
     private OrganizationSecurityService organizationSecurityService;
@@ -306,75 +309,76 @@ class OrganizationSecurityServiceTest {
         @DisplayName("canInviteMembers should return true when user is admin")
         void canInviteMembersShouldReturnTrueWhenUserIsAdmin() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_INVITE)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canInviteMembers(USER_ID, ORG_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_INVITE);
         }
 
         @Test
         @DisplayName("canInviteMembers should return false when user is not admin")
         void canInviteMembersShouldReturnFalseWhenUserIsNotAdmin() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(false);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_INVITE)).thenReturn(false);
 
             // When
             boolean result = organizationSecurityService.canInviteMembers(USER_ID, ORG_ID);
 
             // Then
             assertFalse(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_INVITE);
         }
 
         @Test
         @DisplayName("canManageMembers should return true when user is owner")
         void canManageMembersShouldReturnTrueWhenUserIsOwner() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(false);
-            when(organizationMembershipService.isUserOwner(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
+                    OrganizationPermission.MEMBER_REMOVE)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canManageMembers(USER_ID, ORG_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
-            verify(organizationMembershipService).isUserOwner(USER_ID, ORG_ID);
+            verify(permissionService).hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
+                    OrganizationPermission.MEMBER_REMOVE);
         }
 
         @Test
         @DisplayName("canManageMembers should return true when user is admin but not owner")
         void canManageMembersShouldReturnTrueWhenUserIsAdminButNotOwner() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
+                    OrganizationPermission.MEMBER_REMOVE)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canManageMembers(USER_ID, ORG_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
-            verify(organizationMembershipService, never()).isUserOwner(USER_ID, ORG_ID);
+            verify(permissionService).hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
+                    OrganizationPermission.MEMBER_REMOVE);
         }
 
         @Test
         @DisplayName("canManageMembers should return false when user is not admin")
         void canManageMembersShouldReturnFalseWhenUserIsNotAdmin() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(false);
-            when(organizationMembershipService.isUserOwner(USER_ID, ORG_ID)).thenReturn(false);
+            when(permissionService.hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
+                    OrganizationPermission.MEMBER_REMOVE)).thenReturn(false);
 
             // When
             boolean result = organizationSecurityService.canManageMembers(USER_ID, ORG_ID);
 
             // Then
             assertFalse(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
-            verify(organizationMembershipService).isUserOwner(any(), any());
+            verify(permissionService).hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
+                    OrganizationPermission.MEMBER_REMOVE);
         }
 
         @Test
@@ -409,70 +413,70 @@ class OrganizationSecurityServiceTest {
         @DisplayName("canRemoveMember should return true when admin removes other member")
         void canRemoveMemberShouldReturnTrueWhenAdminRemovesOtherMember() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_REMOVE)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canRemoveMember(USER_ID, ORG_ID, TARGET_USER_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_REMOVE);
         }
 
         @Test
         @DisplayName("canRemoveMember should return false when non-admin tries to remove other member")
         void canRemoveMemberShouldReturnFalseWhenNonAdminTriesToRemoveOtherMember() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(false);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_REMOVE)).thenReturn(false);
 
             // When
             boolean result = organizationSecurityService.canRemoveMember(USER_ID, ORG_ID, TARGET_USER_ID);
 
             // Then
             assertFalse(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_REMOVE);
         }
 
         @Test
         @DisplayName("canViewOrganization should delegate to isMember")
         void canViewOrganizationShouldDelegateToIsMember() {
             // Given
-            when(organizationService.isUserMember(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.ORGANIZATION_VIEW)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canViewOrganization(USER_ID, ORG_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationService).isUserMember(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.ORGANIZATION_VIEW);
         }
 
         @Test
         @DisplayName("canViewStats should delegate to isAdmin")
         void canViewStatsShouldDelegateToIsAdmin() {
             // Given
-            when(organizationMembershipService.isUserAdmin(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.STATS_VIEW)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canViewStats(USER_ID, ORG_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationMembershipService).isUserAdmin(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.STATS_VIEW);
         }
 
         @Test
         @DisplayName("canArchiveOrganization should delegate to isOwner")
         void canArchiveOrganizationShouldDelegateToIsOwner() {
             // Given
-            when(organizationMembershipService.isUserOwner(USER_ID, ORG_ID)).thenReturn(true);
+            when(permissionService.hasPermission(USER_ID, ORG_ID, OrganizationPermission.ORGANIZATION_ARCHIVE)).thenReturn(true);
 
             // When
             boolean result = organizationSecurityService.canArchiveOrganization(USER_ID, ORG_ID);
 
             // Then
             assertTrue(result);
-            verify(organizationMembershipService).isUserOwner(USER_ID, ORG_ID);
+            verify(permissionService).hasPermission(USER_ID, ORG_ID, OrganizationPermission.ORGANIZATION_ARCHIVE);
         }
     }
 

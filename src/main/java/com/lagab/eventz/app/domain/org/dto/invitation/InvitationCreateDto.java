@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.domain.org.dto;
+package com.lagab.eventz.app.domain.org.dto.invitation;
 
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 

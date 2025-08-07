@@ -31,6 +31,7 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final OrganizationMembershipRepository membershipRepository;
     private final OrganizationMapper organizationMapper;
+    private final OrganizationPermissionService permissionService;
 
     /**
      * Creates a new organization and assigns the creator as admin
@@ -53,6 +54,9 @@ public class OrganizationService {
         membership.setRole(OrganizationRole.OWNER);
 
         membershipRepository.save(membership);
+
+        // initialize default permissions
+        permissionService.initializeDefaultPermissions(organization.getId());
 
         // Convert entity to response DTO
         return organizationMapper.toDto(organization);
@@ -123,7 +127,10 @@ public class OrganizationService {
         // Verify user has admin privileges
         ensureUserIsAdmin(userId, id);
 
-        // Delete related memberships first
+        // Delete permissions first
+        permissionService.deleteOrganizationPermissions(id);
+
+        // Delete related memberships
         membershipRepository.deleteByOrganizationId(id);
 
         // Delete organization

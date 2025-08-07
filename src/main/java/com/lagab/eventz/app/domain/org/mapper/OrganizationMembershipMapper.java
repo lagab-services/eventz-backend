@@ -8,8 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import com.lagab.eventz.app.domain.org.dto.MembershipInviteDto;
 import com.lagab.eventz.app.domain.org.dto.OrganizationMembershipDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.MembershipInviteDto;
 import com.lagab.eventz.app.domain.org.model.OrganizationMembership;
 import com.lagab.eventz.app.domain.user.mapper.UserMapper;
 

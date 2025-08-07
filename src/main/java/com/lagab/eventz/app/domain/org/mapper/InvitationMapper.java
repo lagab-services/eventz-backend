@@ -5,8 +5,8 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.lagab.eventz.app.domain.org.dto.InvitationCreateDto;
-import com.lagab.eventz.app.domain.org.dto.InvitationResponseDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.InvitationCreateDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.InvitationResponseDto;
 import com.lagab.eventz.app.domain.org.model.Invitation;
 import com.lagab.eventz.app.domain.user.mapper.UserMapper;
 

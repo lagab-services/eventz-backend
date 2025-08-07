@@ -1,7 +1,9 @@
-package com.lagab.eventz.app.domain.org.dto;
+package com.lagab.eventz.app.domain.org.dto.invitation;
 
 import java.time.LocalDateTime;
 
+import com.lagab.eventz.app.domain.org.dto.OrganizationDto;
+import com.lagab.eventz.app.domain.org.dto.UserInfoDto;
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 
 public record InvitationResponseDto(
