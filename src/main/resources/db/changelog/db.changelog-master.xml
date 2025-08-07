@@ -15,4 +15,5 @@
     <include file="db/changelog/org/26-01-organization-memberships.xml"/>
     <include file="db/changelog/org/26-01-organization-invitations.xml"/>
     <include file="db/changelog/org/07-01-role-permissions.xml"/>
+    <include file="db/changelog/event/event-org.xml"/>
 </databaseChangeLog>

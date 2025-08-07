@@ -6,24 +6,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lagab.eventz.app.common.dto.PageResponse;
-import com.lagab.eventz.app.domain.event.dto.CreateEventDTO;
 import com.lagab.eventz.app.domain.event.dto.EventDTO;
 import com.lagab.eventz.app.domain.event.dto.EventSearchDTO;
 import com.lagab.eventz.app.domain.event.dto.EventSummaryDTO;
-import com.lagab.eventz.app.domain.event.dto.UpdateEventDTO;
 import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
 import com.lagab.eventz.app.domain.event.service.EventSearchService;
@@ -69,6 +64,7 @@ public class EventController {
             @Parameter(description = "Longitude for location search") @RequestParam(required = false) Double longitude,
             @Parameter(description = "Radius in kilometers for location search") @RequestParam(required = false) Double radius,
             @Parameter(description = "Organizer ID filter") @RequestParam(required = false) Long organizerId,
+            @Parameter(description = "Organization ID filter") @RequestParam(required = false) String organizationId,
             @Parameter(description = "Pagination and sorting parameters") @PageableDefault(sort = "startDate") Pageable pageable) {
 
         log.trace("GET /api/v1/events - Searching events with keyword: {}, type: {}, status: {}, city: {}",
@@ -76,7 +72,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 keyword, type, status, city, startDate, endDate, isFree,
-                latitude, longitude, radius, organizerId
+                latitude, longitude, radius, organizerId, organizationId
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -107,7 +103,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 null, null, EventStatus.PUBLISHED, null, LocalDateTime.now(), null, null,
-                null, null, null, null
+                null, null, null, null, null
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -184,7 +180,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 null, null, EventStatus.PUBLISHED, city, null, null, null,
-                null, null, null, null
+                null, null, null, null, null
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -207,7 +203,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 null, type, EventStatus.PUBLISHED, null, null, null, null,
-                null, null, null, null
+                null, null, null, null, null
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -221,7 +217,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 null, null, EventStatus.PUBLISHED, null, null, null, true,
-                null, null, null, null
+                null, null, null, null, null
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -270,7 +266,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 null, type, EventStatus.PUBLISHED, null, LocalDateTime.now(), null, isFree,
-                latitude, longitude, radius, null
+                latitude, longitude, radius, null, null
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -285,7 +281,7 @@ public class EventController {
 
         EventSearchDTO searchDTO = new EventSearchDTO(
                 null, null, status, null, null, null, null,
-                null, null, null, null
+                null, null, null, null, null
         );
 
         Page<EventSummaryDTO> events = eventSearchService.searchEvents(searchDTO, pageable);
@@ -305,86 +301,5 @@ public class EventController {
         log.trace("GET /api/v1/events/organizer/{}/count - Counting events by organizer", organizerId);
         long count = eventService.countEventsByOrganizer(organizerId);
         return ResponseEntity.ok(count);
-    }
-
-    // Endpoints de gestion des événements (CRUD)
-    @Operation(summary = "Create a new event", description = "Create a new event with the provided details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Event created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
-    @PostMapping
-    public ResponseEntity<EventDTO> createEvent(
-            @Parameter(description = "Event creation data", required = true)
-            @Valid @RequestBody CreateEventDTO createEventDTO) {
-        log.trace("POST /api/v1/events - Creating new event: {}", createEventDTO.name());
-        EventDTO createdEvent = eventService.createEvent(createEventDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
-    }
-
-    @Operation(summary = "Update an event", description = "Update an existing event with new information")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Event updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "404", description = "Event not found")
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<EventDTO> updateEvent(
-            @Parameter(description = "ID of the event to update", required = true)
-            @PathVariable Long id,
-            @Parameter(description = "Updated event data", required = true)
-            @Valid @RequestBody UpdateEventDTO updateEventDTO) {
-
-        log.trace("PUT /api/v1/events/{} - Updating event", id);
-        EventDTO updatedEvent = eventService.updateEvent(id, updateEventDTO);
-        return ResponseEntity.ok(updatedEvent);
-    }
-
-    @Operation(summary = "Delete an event", description = "Delete an existing event")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Event deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Event not found")
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(
-            @Parameter(description = "ID of the event to delete", required = true)
-            @PathVariable Long id) {
-        log.trace("DELETE /api/v1/events/{} - Deleting event", id);
-        eventService.deleteEvent(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Publish an event",
-            description = "Change an event's status to published")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Event published successfully"),
-            @ApiResponse(responseCode = "404", description = "Event not found"),
-            @ApiResponse(responseCode = "409", description = "Event cannot be published")
-    })
-    @PutMapping("/{id}/publish")
-    public ResponseEntity<EventDTO> publishEvent(
-            @Parameter(description = "ID of the event to publish", required = true)
-            @PathVariable Long id) {
-        log.trace("PUT /api/v1/events/{}/publish - Publishing event", id);
-        EventDTO publishedEvent = eventService.publishEvent(id);
-        return ResponseEntity.ok(publishedEvent);
-    }
-
-    @Operation(summary = "Cancel an event",
-            description = "Change an event's status to cancelled")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Event cancelled successfully"),
-            @ApiResponse(responseCode = "404", description = "Event not found"),
-            @ApiResponse(responseCode = "409", description = "Event cannot be cancelled")
-    })
-    @PutMapping("/{id}/cancel")
-    public ResponseEntity<EventDTO> cancelEvent(
-            @Parameter(description = "ID of the event to cancel", required = true)
-            @PathVariable Long id) {
-
-        log.trace("PUT /api/v1/events/{}/cancel - Cancelling event", id);
-        EventDTO cancelledEvent = eventService.cancelEvent(id);
-        return ResponseEntity.ok(cancelledEvent);
     }
 }

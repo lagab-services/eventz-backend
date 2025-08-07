@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<MessageResponse> handleAuthenticationException(AuthenticationException e) {
+        log.error("Authentication error: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .body(new MessageResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<MessageResponse> handleDisabledException(DisabledException e) {
         log.error("Authentication error: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .body(new MessageResponse(e.getMessage()));

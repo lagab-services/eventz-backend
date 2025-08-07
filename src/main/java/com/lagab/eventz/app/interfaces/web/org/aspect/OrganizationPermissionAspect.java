@@ -15,6 +15,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
+import com.lagab.eventz.app.domain.event.service.EventService;
 import com.lagab.eventz.app.domain.org.model.OrganizationPermission;
 import com.lagab.eventz.app.domain.org.service.OrganizationSecurityService;
 import com.lagab.eventz.app.interfaces.web.org.annotation.RequireOrganizationPermission;
@@ -30,6 +31,7 @@ public class OrganizationPermissionAspect {
     private final OrganizationSecurityService securityService;
     private final ExpressionParser parser = new SpelExpressionParser();
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+    private final EventService eventService;
 
     @Around("@annotation(requirePermission)")
     public Object checkPermission(ProceedingJoinPoint joinPoint, RequireOrganizationPermission requirePermission) throws Throwable {
@@ -45,8 +47,27 @@ public class OrganizationPermissionAspect {
             context.setVariable(parameterNames[i], args[i]);
         }
 
-        Expression expression = parser.parseExpression(requirePermission.organizationId());
-        String organizationId = expression.getValue(context, String.class);
+        String organizationId = null;
+
+        // if eventId are specified retrieve organizationId from event
+        if (!requirePermission.eventId().isEmpty()) {
+            Expression eventIdExpression = parser.parseExpression(requirePermission.eventId());
+            Object eventIdValue = eventIdExpression.getValue(context);
+
+            if (eventIdValue != null) {
+                Long eventId = convertToLong(eventIdValue);
+                organizationId = eventService.getOrganizationIdByEventId(eventId);
+            }
+        }
+        // else use organizationId
+        if (organizationId == null && !requirePermission.organizationId().isEmpty()) {
+            Expression organizationIdExpression = parser.parseExpression(requirePermission.organizationId());
+            organizationId = organizationIdExpression.getValue(context, String.class);
+        }
+
+        if (organizationId == null) {
+            throw new IllegalArgumentException("Could not resolve organization ID from the provided expression");
+        }
 
         // Check the permission
         OrganizationPermission permission = OrganizationPermission.valueOf(requirePermission.permission());
@@ -62,5 +83,17 @@ public class OrganizationPermissionAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         return parameterNameDiscoverer.getParameterNames(method);
+    }
+
+    private Long convertToLong(Object value) {
+        if (value instanceof Long) {
+            return (Long) value;
+        } else if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        } else if (value instanceof String) {
+            return Long.parseLong((String) value);
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + value.getClass().getSimpleName() + " to Long");
+        }
     }
 }

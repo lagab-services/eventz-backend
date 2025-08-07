@@ -175,7 +175,7 @@ public class OrganizationMembershipService {
 
         // Delete membership record
         membershipRepository.delete(membership);
-        log.info("Member removed from organization: membershipId={}", membershipId);
+        log.debug("Member removed from organization: membershipId={}", membershipId);
     }
 
     /**
@@ -227,7 +227,7 @@ public class OrganizationMembershipService {
         OrganizationDto organization = organizationService.getOrganization(invitationDto.organizationId());
         emailService.sendOrganizationInvitation(organization, inviter, token, invitationDto.email());
 
-        log.info("Invitation sent: email={}, organizationId={}", invitationDto.email(), invitationDto.organizationId());
+        log.debug("Invitation sent: email={}, organizationId={}", invitationDto.email(), invitationDto.organizationId());
 
         return invitationMapper.entityToResponseDto(invitation);
     }
@@ -259,7 +259,7 @@ public class OrganizationMembershipService {
         // Delete the used invitation
         invitationRepository.delete(invitation);
 
-        log.info("Invitation accepted: userId={}, organizationId={}", user.getId(), invitation.getOrganization().getId());
+        log.debug("Invitation accepted: userId={}, organizationId={}", user.getId(), invitation.getOrganization().getId());
 
         return membership;
     }
@@ -294,7 +294,7 @@ public class OrganizationMembershipService {
         organizationService.ensureUserIsAdmin(userId, invitation.getOrganization().getId());
 
         invitationRepository.delete(invitation);
-        log.info("Invitation cancelled: invitationId={}", invitationId);
+        log.debug("Invitation cancelled: invitationId={}", invitationId);
     }
 
     /**

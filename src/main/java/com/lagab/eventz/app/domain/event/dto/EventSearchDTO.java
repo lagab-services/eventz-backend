@@ -16,10 +16,11 @@ public record EventSearchDTO(
         Double latitude,
         Double longitude,
         Double radius,
-        Long organizerId
+        Long organizerId,
+        String organizationId
 ) {
 
     public EventSearchDTO() {
-        this(null, null, null, null, null, null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }

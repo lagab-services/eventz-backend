@@ -17,6 +17,8 @@ import com.lagab.eventz.app.domain.event.mapper.EventMapper;
 import com.lagab.eventz.app.domain.event.model.Event;
 import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
+import com.lagab.eventz.app.domain.org.model.Organization;
+import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final AddressService addressService;
+    private final OrganizationService organizationService;
     //private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
@@ -47,13 +50,16 @@ public class EventService {
                      .map(this::enrichEventDTO);
     }
 
-    public EventDTO createEvent(CreateEventDTO createEventDTO) {
+    public EventDTO createEvent(String orgId, CreateEventDTO createEventDTO) {
         log.debug("Creating new event: {}", createEventDTO.name());
 
         User organizer = getCurrentUser();
 
+        Organization organization = organizationService.getOrganizationById(orgId);
+
         Event event = eventMapper.toEntity(createEventDTO);
         event.setOrganizer(organizer);
+        event.setOrganization(organization);
 
         if (createEventDTO.address() != null) {
             event.setAddress(addressService.createAddress(createEventDTO.address(), event));
@@ -67,13 +73,7 @@ public class EventService {
 
     public EventDTO updateEvent(Long id, UpdateEventDTO updateEventDTO) {
         log.debug("Updating event with ID: {}", id);
-        User currentUser = getCurrentUser();
         Event event = findEventById(id);
-
-        // Check if user is authorized to update this event
-        if (!event.getOrganizer().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException("You are not authorized to update this event");
-        }
 
         eventMapper.updateEntity(updateEventDTO, event);
 
@@ -116,12 +116,6 @@ public class EventService {
         log.debug("Publishing event with ID: {}", id);
 
         Event event = findEventById(id);
-        User currentUser = getCurrentUser();
-
-        // Check if user is authorized to publish this event
-        if (!event.getOrganizer().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException("You are not authorized to publish this event");
-        }
 
         // Validate event can be published
         validateEventForPublishing(event);
@@ -158,6 +152,16 @@ public class EventService {
         return eventRepository.countByOrganizerId(organizerId);
     }
 
+    @Transactional(readOnly = true)
+    public long countEventsByOrganization(String orgId) {
+        return eventRepository.countByOrganizationId(orgId);
+    }
+
+    public String getOrganizationIdByEventId(Long eventId) {
+        return eventRepository.findOrganizationIdByEventId(eventId)
+                              .orElseThrow(() -> new EventNotFoundException("Event not found with id: " + eventId));
+    }
+
     // Private helper methods
     private Event findEventById(Long id) {
         return eventRepository.findById(id)
@@ -177,6 +181,7 @@ public class EventService {
                 dto.type(), dto.imageUrl(), dto.website(), dto.maxAttendees(),
                 dto.isPublic(), dto.isFree(), dto.currency(), dto.createdAt(),
                 dto.updatedAt(), dto.organizerId(), dto.organizerName(),
+                dto.organizationId(), dto.organizationName(),
                 dto.address(), dto.ticketTypes(), averageRating, reviewCount
         );
     }

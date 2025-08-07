@@ -30,6 +30,8 @@ public record EventDTO(
         LocalDateTime updatedAt,
         Long organizerId,
         String organizerName,
+        String organizationId,
+        String organizationName,
         AddressDTO address,
         List<TicketTypeDTO> ticketTypes,
         Double averageRating,
