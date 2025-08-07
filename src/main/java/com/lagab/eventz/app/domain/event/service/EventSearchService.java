@@ -50,9 +50,28 @@ public class EventSearchService {
     }
 
     @Transactional(readOnly = true)
+    public Page<EventSummaryDTO> findEventsByOrganization(String orgId, Pageable pageable) {
+        Specification<Event> spec = EventSpecifications.publicEvents()
+                                                       .and(EventSpecifications.hasOrganization(orgId));
+
+        Page<Event> events = eventRepository.findAll(spec, pageable);
+        return events.map(eventMapper::toSummaryDto).map(this::enrichEventSummaryDTO);
+    }
+
+    @Transactional(readOnly = true)
     public Page<EventSummaryDTO> findUpcomingEventsByOrganizer(Long organizerId, Pageable pageable) {
         Specification<Event> spec = EventSpecifications.publicEvents()
                                                        .and(EventSpecifications.hasOrganizer(organizerId))
+                                                       .and(EventSpecifications.upcomingEvents());
+
+        Page<Event> events = eventRepository.findAll(spec, pageable);
+        return events.map(eventMapper::toSummaryDto).map(this::enrichEventSummaryDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDTO> findUpcomingEventsByOrganization(String orgId, Pageable pageable) {
+        Specification<Event> spec = EventSpecifications.publicEvents()
+                                                       .and(EventSpecifications.hasOrganization(orgId))
                                                        .and(EventSpecifications.upcomingEvents());
 
         Page<Event> events = eventRepository.findAll(spec, pageable);
@@ -100,4 +119,5 @@ public class EventSearchService {
                     })
                     .sum();
     }
+
 }

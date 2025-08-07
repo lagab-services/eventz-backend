@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.lagab.eventz.app.domain.event.dto.EventSearchDTO;
@@ -157,6 +158,16 @@ public class EventSpecifications {
         };
     }
 
+    // Returns a specification to filter events by organization
+    public static Specification<Event> hasOrganization(String orgId) {
+        return (root, query, criteriaBuilder) -> {
+            if (StringUtils.isNotBlank(orgId)) {
+                return criteriaBuilder.conjunction(); // No filter if orgId is null
+            }
+            return criteriaBuilder.equal(root.get("organization").get("id"), orgId);
+        };
+    }
+
     // Main method to combine all search criteria
     public static Specification<Event> withCriteria(EventSearchDTO searchDTO) {
         return (root, query, criteriaBuilder) -> {
@@ -206,6 +217,13 @@ public class EventSpecifications {
             // Free events filter
             if (searchDTO.isFree() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("isFree"), searchDTO.isFree()));
+            }
+
+            // Organization filter
+            if (searchDTO.organizationId() != null) {
+                predicates.add(criteriaBuilder.equal(
+                        root.get("organization").get("id"), searchDTO.organizationId()
+                ));
             }
 
             // Organizer filter

@@ -12,6 +12,7 @@ import com.lagab.eventz.app.domain.event.dto.EventDTO;
 import com.lagab.eventz.app.domain.event.dto.EventSummaryDTO;
 import com.lagab.eventz.app.domain.event.dto.UpdateEventDTO;
 import com.lagab.eventz.app.domain.event.model.Event;
+import com.lagab.eventz.app.domain.org.model.Organization;
 import com.lagab.eventz.app.domain.user.model.User;
 
 @Mapper(componentModel = "spring", uses = { AddressMapper.class, TicketTypeMapper.class })
@@ -19,6 +20,8 @@ public interface EventMapper {
 
     @Mapping(source = "organizer.id", target = "organizerId")
     @Mapping(source = "organizer", target = "organizerName", qualifiedByName = "formatOrganizerName")
+    @Mapping(source = "organization.id", target = "organizationId")
+    @Mapping(source = "organization", target = "organizationName", qualifiedByName = "formatOrganizationName")
     @Mapping(target = "averageRating", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
     EventDTO toDto(Event event);
@@ -28,6 +31,7 @@ public interface EventMapper {
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "status", constant = "DRAFT")
     @Mapping(target = "organizer", ignore = true)
+    @Mapping(target = "organization", ignore = true)
     @Mapping(target = "ticketTypes", ignore = true)
     @Mapping(target = "orders", ignore = true)
         //@Mapping(target = "reviews", ignore = true)
@@ -37,6 +41,7 @@ public interface EventMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "organizer", ignore = true)
+    @Mapping(target = "organization", ignore = true)
     @Mapping(target = "ticketTypes", ignore = true)
     @Mapping(target = "orders", ignore = true)
     //@Mapping(target = "reviews", ignore = true)
@@ -53,5 +58,10 @@ public interface EventMapper {
     @Named("formatOrganizerName")
     default String formatOrganizerName(User user) {
         return user.getFullName();
+    }
+
+    @Named("formatOrganizationName")
+    default String formatOrganizationName(Organization organization) {
+        return organization.getName();
     }
 }

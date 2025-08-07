@@ -108,7 +108,10 @@ public class AuthService {
         user = userRepository.save(user);
 
         // Generate email verification token
-        tokenService.generateEmailVerificationToken(user);
+        Token registerToken = tokenService.generateEmailVerificationToken(user);
+
+        //send mail for the new user to validate his account
+        emailService.sendValidationEmail(user, registerToken.getToken());
 
         log.info("New user registered: {}", user.getEmail());
 

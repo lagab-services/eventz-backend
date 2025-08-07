@@ -91,7 +91,7 @@ public class OrganizationPermissionService {
         createPermissionsForRole(organizationId, OrganizationRole.MEMBER, memberPermissions);
         createPermissionsForRole(organizationId, OrganizationRole.VIEWER, viewerPermissions);
 
-        log.info("Default permissions initialized for organization: {}", organizationId);
+        log.debug("Default permissions initialized for organization: {}", organizationId);
     }
 
     /**

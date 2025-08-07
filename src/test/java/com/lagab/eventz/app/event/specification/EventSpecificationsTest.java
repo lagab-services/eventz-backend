@@ -578,7 +578,7 @@ class EventSpecificationsTest {
         void shouldCreateSpecificationWithOnlyPublicFilterWhenEventSearchDTOIsEmpty() {
             // Given
             EventSearchDTO searchDTO = new EventSearchDTO(
-                    null, null, null, null, null, null, null, null, null, null, null
+                    null, null, null, null, null, null, null, null, null, null, null, null
             );
 
             Path<Boolean> isPublicPath = mock(Path.class);
@@ -604,7 +604,7 @@ class EventSpecificationsTest {
         void shouldHandleEmptyStringsCorrectly() {
             // Given
             EventSearchDTO searchDTO = new EventSearchDTO(
-                    "   ", null, null, "   ", null, null, null, null, null, null, null
+                    "   ", null, null, "   ", null, null, null, null, null, null, null, null
             );
 
             Path<Boolean> isPublicPath = mock(Path.class);
@@ -631,7 +631,7 @@ class EventSpecificationsTest {
         void shouldHandlePartialGeographicCriteria() {
             // Given
             EventSearchDTO searchDTO = new EventSearchDTO(
-                    null, null, null, null, null, null, null, 48.8566, null, 10.0, null
+                    null, null, null, null, null, null, null, 48.8566, null, 10.0, null, null
             );
 
             Path<Boolean> isPublicPath = mock(Path.class);

@@ -3,6 +3,8 @@ package com.lagab.eventz.app.domain.event.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.lagab.eventz.app.domain.org.model.Organization;
 import com.lagab.eventz.app.domain.payment.entity.Order;
 import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 import com.lagab.eventz.app.domain.user.model.User;
@@ -107,6 +109,11 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Order> orders;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    @JsonIgnoreProperties("events")
+    private Organization organization;
 
     /*@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Review> reviews;*/

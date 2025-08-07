@@ -20,6 +20,8 @@ import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
 import com.lagab.eventz.app.domain.event.specification.EventSpecifications;
+import com.lagab.eventz.app.domain.org.model.Organization;
+import com.lagab.eventz.app.domain.org.repository.OrganizationRepository;
 import com.lagab.eventz.app.domain.user.model.User;
 import com.lagab.eventz.app.domain.user.repository.UserRepository;
 
@@ -38,11 +40,14 @@ class EventSpecificationsIntegrationTest {
     private EventRepository eventRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrganizationRepository organizationRepository;
 
     private Event testEvent1;
     private Event testEvent2;
     private Event testEvent3;
     private User testOrganizer;
+    private Organization testOrganization;
 
     @BeforeEach
     void setUp() {
@@ -53,15 +58,18 @@ class EventSpecificationsIntegrationTest {
         testOrganizer = createTestOrganizer();
         testOrganizer = userRepository.save(testOrganizer);
 
+        testOrganization = createTestOrganization();
+        testOrganization = organizationRepository.save(testOrganization);
+
         // Create test events
         testEvent1 = createTestEvent("Spring Conference", "Learn about Spring",
-                EventType.CONFERENCE, EventStatus.PUBLISHED, "Paris", true, true, testOrganizer);
+                EventType.CONFERENCE, EventStatus.PUBLISHED, "Paris", true, true, testOrganizer, testOrganization);
 
         testEvent2 = createTestEvent("Java Workshop", "Hands-on Java coding",
-                EventType.WORKSHOP, EventStatus.DRAFT, "Lyon", false, true, testOrganizer);
+                EventType.WORKSHOP, EventStatus.DRAFT, "Lyon", false, true, testOrganizer, testOrganization);
 
         testEvent3 = createTestEvent("Tech Meetup", "Networking event",
-                EventType.SEMINAR, EventStatus.PUBLISHED, "Paris", true, false, testOrganizer);
+                EventType.SEMINAR, EventStatus.PUBLISHED, "Paris", true, false, testOrganizer, testOrganization);
 
         // Save using repository
         testEvent1 = eventRepository.save(testEvent1);
@@ -78,6 +86,7 @@ class EventSpecificationsIntegrationTest {
         // Clean up after each test
         eventRepository.deleteAll();
         userRepository.deleteAll();
+        organizationRepository.deleteAll();
     }
 
     private User createTestOrganizer() {
@@ -86,6 +95,14 @@ class EventSpecificationsIntegrationTest {
         organizer.setLastName("Organizer");
         organizer.setEmail("test@example.com");
         organizer.setPassword("password");
+        return organizer;
+    }
+
+    private Organization createTestOrganization() {
+        Organization organizer = new Organization();
+        organizer.setName("Test Organization");
+        organizer.setSlug("test-organization");
+        organizer.setEmail("test@example.com");
         return organizer;
     }
 
@@ -192,6 +209,7 @@ class EventSpecificationsIntegrationTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -230,7 +248,7 @@ class EventSpecificationsIntegrationTest {
         // Given
         // Create an event in the future
         Event futureEvent = createTestEvent("Future Event", "Event in future",
-                EventType.CONFERENCE, EventStatus.PUBLISHED, "Paris", true, true, testOrganizer);
+                EventType.CONFERENCE, EventStatus.PUBLISHED, "Paris", true, true, testOrganizer, testOrganization);
         futureEvent.setStartDate(LocalDateTime.now().plusDays(10));
         entityManager.persistAndFlush(futureEvent);
 
@@ -259,7 +277,7 @@ class EventSpecificationsIntegrationTest {
     }
 
     private Event createTestEvent(String name, String description, EventType type,
-            EventStatus status, String city, boolean isFree, boolean isPublic, User organizer) {
+            EventStatus status, String city, boolean isFree, boolean isPublic, User organizer, Organization organization) {
         Event event = new Event();
         event.setName(name);
         event.setDescription(description);
@@ -279,6 +297,7 @@ class EventSpecificationsIntegrationTest {
 
         // Create organizer
         event.setOrganizer(organizer);
+        event.setOrganization(organization);
 
         return event;
     }

@@ -88,6 +88,18 @@ public class OrganizationService {
     }
 
     /**
+     * Retrieves an organization by its ID
+     *
+     * @param id - Organization ID
+     * @return OrganizationResponseDto - The requested organization
+     * @throws EntityNotFoundException - If organization is not found
+     */
+    @Transactional(readOnly = true)
+    public Organization getOrganizationById(String id) {
+        return findOrganizationById(id);
+    }
+
+    /**
      * Updates an organization's details
      *
      * @param id        - Organization ID to update

@@ -20,6 +20,7 @@ import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeStatsDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.UpdateTicketTypeRequest;
 import com.lagab.eventz.app.domain.event.service.TicketTypeService;
+import com.lagab.eventz.app.interfaces.web.org.annotation.RequireOrganizationPermission;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,7 +38,7 @@ public class TicketTypeController {
 
     @PostMapping("/event/{eventId}")
     @Operation(summary = "Create a new ticket type")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @eventService.isEventOrganizer(#request.eventId(), authentication.name))")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<TicketTypeDTO> createTicketType(@PathVariable Long eventId, @Valid @RequestBody CreateTicketTypeRequest request) {
         var ticketType = ticketTypeService.createTicketType(eventId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketType);
@@ -45,7 +46,7 @@ public class TicketTypeController {
 
     @PostMapping("/bulk")
     @Operation(summary = "Create multiple ticket types at once")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @eventService.isEventOrganizer(#eventId, authentication.name))")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<List<TicketTypeDTO>> createBulkTicketTypes(
             @Parameter(description = "Event ID") @RequestParam Long eventId,
             @Valid @RequestBody List<CreateTicketTypeRequest> requests) {
@@ -62,6 +63,7 @@ public class TicketTypeController {
 
     @GetMapping("/event/{eventId}")
     @Operation(summary = "Get all ticket types for an event")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<List<TicketTypeDTO>> getTicketTypesByEventId(@PathVariable Long eventId) {
         var ticketTypes = ticketTypeService.getTicketTypesByEventId(eventId);
         return ResponseEntity.ok(ticketTypes);
@@ -83,7 +85,7 @@ public class TicketTypeController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a ticket type")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @ticketTypeService.isTicketTypeOwner(#id, authentication.name))")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<TicketTypeDTO> updateTicketType(
             @PathVariable Long id,
             @Valid @RequestBody UpdateTicketTypeRequest request) {
@@ -93,7 +95,7 @@ public class TicketTypeController {
 
     @PutMapping("/bulk")
     @Operation(summary = "Update multiple ticket types at once")
-    //@PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<List<TicketTypeDTO>> updateBulkTicketTypes(@Valid @RequestBody BulkUpdateTicketTypeRequest request) {
         var ticketTypes = ticketTypeService.updateBulkTicketTypes(request);
         return ResponseEntity.ok(ticketTypes);
@@ -101,7 +103,7 @@ public class TicketTypeController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a ticket type")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @ticketTypeService.isTicketTypeOwner(#id, authentication.name))")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<Void> deleteTicketType(@PathVariable Long id) {
         ticketTypeService.deleteTicketType(id);
         return ResponseEntity.noContent().build();
@@ -109,7 +111,7 @@ public class TicketTypeController {
 
     @PostMapping("/{id}/toggle-active")
     @Operation(summary = "Enable/Disable a ticket type")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @ticketTypeService.isTicketTypeOwner(#id, authentication.name))")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<TicketTypeDTO> toggleActiveStatus(@PathVariable Long id) {
         var ticketType = ticketTypeService.toggleActiveStatus(id);
         return ResponseEntity.ok(ticketType);
@@ -117,7 +119,7 @@ public class TicketTypeController {
 
     @GetMapping("/event/{eventId}/stats")
     @Operation(summary = "Get ticket type statistics for an event")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @eventService.isEventOrganizer(#eventId, authentication.name))")
+    @RequireOrganizationPermission(permission = "STATS_VIEW")
     public ResponseEntity<TicketTypeStatsDTO> getEventTicketTypeStats(@PathVariable Long eventId) {
         var stats = ticketTypeService.getEventTicketTypeStats(eventId);
         return ResponseEntity.ok(stats);
@@ -134,7 +136,7 @@ public class TicketTypeController {
 
     @PutMapping("/event/{eventId}/reorder")
     @Operation(summary = "Reorder ticket types")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @eventService.isEventOrganizer(#eventId, authentication.name))")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<List<TicketTypeDTO>> reorderTicketTypes(
             @PathVariable Long eventId,
             @RequestBody List<Long> ticketTypeIds) {

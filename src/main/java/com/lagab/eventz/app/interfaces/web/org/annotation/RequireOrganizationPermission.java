@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 public @interface RequireOrganizationPermission {
     String permission();
 
-    String organizationId() default "#organizationId";
+    String organizationId() default "#orgId";
+
+    String eventId() default "#eventId";
 }
