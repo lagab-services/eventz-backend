@@ -26,4 +26,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=45s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-ENTRYPOINT ["sh", "-c","java ${JAVA_OPTS:-}", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS:-} -jar app.jar"]

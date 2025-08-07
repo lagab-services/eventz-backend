@@ -104,9 +104,9 @@ public class EventService {
         }
 
         // Check if event can be deleted (no orders or past events)
-        if (event.getOrders() != null && !event.getOrders().isEmpty()) {
+       /* if (event.getOrders() != null && !event.getOrders().isEmpty()) {
             throw new IllegalStateException("Cannot delete event with existing orders");
-        }
+        }*/
 
         eventRepository.delete(event);
         log.debug("Event deleted successfully with ID: {}", id);
