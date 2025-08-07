@@ -8,12 +8,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lagab.eventz.app.common.exception.BusinessException;
 import com.lagab.eventz.app.domain.auth.service.EmailService;
-import com.lagab.eventz.app.domain.org.dto.InvitationCreateDto;
-import com.lagab.eventz.app.domain.org.dto.InvitationResponseDto;
-import com.lagab.eventz.app.domain.org.dto.MembershipInviteDto;
 import com.lagab.eventz.app.domain.org.dto.OrganizationDto;
 import com.lagab.eventz.app.domain.org.dto.OrganizationMembershipDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.InvitationCreateDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.InvitationResponseDto;
+import com.lagab.eventz.app.domain.org.dto.invitation.MembershipInviteDto;
 import com.lagab.eventz.app.domain.org.mapper.InvitationMapper;
 import com.lagab.eventz.app.domain.org.mapper.OrganizationMembershipMapper;
 import com.lagab.eventz.app.domain.org.model.Invitation;
@@ -208,7 +209,7 @@ public class OrganizationMembershipService {
     public InvitationResponseDto inviteNewUser(InvitationCreateDto invitationDto, User inviter) {
         // Check if invitation already exists
         if (invitationRepository.existsByEmailAndOrganizationId(invitationDto.email(), invitationDto.organizationId())) {
-            throw new IllegalArgumentException("Invitation already exists for this email and organization");
+            throw new BusinessException("Invitation already exists for this email and organization");
         }
 
         // Generate a secure random token

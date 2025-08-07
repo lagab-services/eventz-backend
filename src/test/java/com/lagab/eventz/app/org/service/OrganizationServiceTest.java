@@ -20,6 +20,7 @@ import com.lagab.eventz.app.domain.org.model.OrganizationMembership;
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 import com.lagab.eventz.app.domain.org.repository.OrganizationMembershipRepository;
 import com.lagab.eventz.app.domain.org.repository.OrganizationRepository;
+import com.lagab.eventz.app.domain.org.service.OrganizationPermissionService;
 import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.model.User;
 
@@ -49,6 +50,9 @@ class OrganizationServiceTest {
 
     @Mock
     private OrganizationMapper organizationMapper;
+
+    @Mock
+    private OrganizationPermissionService permissionService;
 
     @InjectMocks
     private OrganizationService organizationService;
