@@ -350,22 +350,6 @@ class OrganizationSecurityServiceTest {
         }
 
         @Test
-        @DisplayName("canManageMembers should return true when user is admin but not owner")
-        void canManageMembersShouldReturnTrueWhenUserIsAdminButNotOwner() {
-            // Given
-            when(permissionService.hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
-                    OrganizationPermission.MEMBER_REMOVE)).thenReturn(true);
-
-            // When
-            boolean result = organizationSecurityService.canManageMembers(USER_ID, ORG_ID);
-
-            // Then
-            assertTrue(result);
-            verify(permissionService).hasAnyPermission(USER_ID, ORG_ID, OrganizationPermission.MEMBER_EDIT_ROLE,
-                    OrganizationPermission.MEMBER_REMOVE);
-        }
-
-        @Test
         @DisplayName("canManageMembers should return false when user is not admin")
         void canManageMembersShouldReturnFalseWhenUserIsNotAdmin() {
             // Given

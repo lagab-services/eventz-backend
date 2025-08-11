@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class AuthService {
 
+    public static final String BEARER = "Bearer";
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final UserMapper userMapper;
@@ -60,11 +61,6 @@ public class AuthService {
 
             User user = (User) authentication.getPrincipal();
 
-            // Check if user is active
-            if (!user.getIsActive()) {
-                throw new AuthenticationException("Account is disabled");
-            }
-
             // Generate tokens
             String accessTokenString = jwtService.generateAccessToken(
                     user.getId(),
@@ -80,7 +76,7 @@ public class AuthService {
             return new AuthResponse(
                     accessTokenString,
                     refreshToken.getToken(),
-                    "Bearer",
+                    BEARER,
                     jwtService.getAccessTokenValidityInMilliseconds(),
                     userMapper.toResponse(user),
                     organizations
@@ -124,7 +120,7 @@ public class AuthService {
         return new AuthResponse(
                 accessToken.getToken(),
                 refreshToken.getToken(),
-                "Bearer",
+                BEARER,
                 accessToken.getExpiresAt().toEpochSecond(java.time.ZoneOffset.UTC) -
                         java.time.LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC),
                 userMapper.toResponse(user),
@@ -142,11 +138,6 @@ public class AuthService {
 
         User user = refreshToken.getUser();
 
-        // Verify if user is still active
-        if (!user.getIsActive()) {
-            throw new AuthenticationException("Account is disabled");
-        }
-
         // Generate new tokens
         Token newAccessToken = tokenService.generateAccessToken(user, ipAddress, userAgent);
         Token newRefreshToken = tokenService.generateRefreshToken(user, ipAddress, userAgent, false);
@@ -160,7 +151,7 @@ public class AuthService {
         return new AuthResponse(
                 newAccessToken.getToken(),
                 newRefreshToken.getToken(),
-                "Bearer",
+                BEARER,
                 newAccessToken.getExpiresAt().toEpochSecond(java.time.ZoneOffset.UTC) -
                         java.time.LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC),
                 userMapper.toResponse(user),
@@ -256,7 +247,7 @@ public class AuthService {
 
         User user = userOpt.get();
 
-        if (!user.getIsActive()) {
+        if (Boolean.FALSE.equals(user.getIsActive())) {
             log.warn("Password reset request for disabled account: {}", request.email());
             return;
         }
@@ -314,7 +305,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                                   .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (user.getIsEmailVerified()) {
+        if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
             throw new ValidationException("Email already verified");
         }
 
