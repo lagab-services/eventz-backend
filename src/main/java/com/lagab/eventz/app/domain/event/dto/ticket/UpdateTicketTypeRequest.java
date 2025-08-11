@@ -41,6 +41,8 @@ public record UpdateTicketTypeRequest(
         @Min(value = 1, message = "Maximum quantity must be at least 1")
         Integer maxQuantity,
 
-        Boolean isActive
+        Boolean isActive,
+
+        Long categoryId
 ) {
 }

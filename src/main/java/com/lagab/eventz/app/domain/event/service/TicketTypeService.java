@@ -2,7 +2,9 @@ package com.lagab.eventz.app.domain.event.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,11 @@ import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeStatsDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.UpdateTicketTypeRequest;
 import com.lagab.eventz.app.domain.event.mapper.TicketTypeMapper;
+import com.lagab.eventz.app.domain.event.model.TicketCategory;
+import com.lagab.eventz.app.domain.event.model.TicketType;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
+import com.lagab.eventz.app.domain.event.repository.TicketCategoryRepository;
 import com.lagab.eventz.app.domain.event.repository.TicketTypeRepository;
-import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TicketTypeService {
 
+    public static final String TICKET_TYPE_NOT_FOUND_WITH_ID = "Ticket type not found with ID: ";
     private final TicketTypeRepository ticketTypeRepository;
     private final EventRepository eventRepository;
     private final TicketTypeMapper ticketTypeMapper;
+    private final TicketCategoryRepository ticketCategoryRepository;
 
     public TicketTypeDTO createTicketType(Long eventId, CreateTicketTypeRequest request) {
         log.debug("Creating new ticket type: {} for event: {}", request.name(), eventId);
@@ -44,6 +50,19 @@ public class TicketTypeService {
 
         var ticketType = ticketTypeMapper.toEntity(request);
         ticketType.setEvent(event);
+        // Set category if specified
+        if (request.categoryId() != null) {
+            var category = ticketCategoryRepository.findById(request.categoryId())
+                                                   .orElseThrow(() -> new EntityNotFoundException(
+                                                           "Ticket category not found with ID: " + request.categoryId()));
+
+            // Verify category belongs to the same event
+            if (!category.getEvent().getId().equals(eventId)) {
+                throw new BusinessException("Category does not belong to this event");
+            }
+
+            ticketType.setCategory(category);
+        }
 
         // Set sort order if not specified
         if (ticketType.getSortOrder() == null) {
@@ -87,7 +106,7 @@ public class TicketTypeService {
     @Transactional(readOnly = true)
     public TicketTypeDTO getTicketTypeById(Long id) {
         var ticketType = ticketTypeRepository.findById(id)
-                                             .orElseThrow(() -> new EntityNotFoundException("Ticket type not found with ID: " + id));
+                                             .orElseThrow(() -> new EntityNotFoundException(TICKET_TYPE_NOT_FOUND_WITH_ID + id));
         return ticketTypeMapper.toDTO(ticketType);
     }
 
@@ -113,7 +132,7 @@ public class TicketTypeService {
         log.debug("Updating ticket type: {}", id);
 
         var ticketType = ticketTypeRepository.findById(id)
-                                             .orElseThrow(() -> new EntityNotFoundException("Ticket type not found with ID: " + id));
+                                             .orElseThrow(() -> new EntityNotFoundException(TICKET_TYPE_NOT_FOUND_WITH_ID + id));
 
         // Validate dates if modified
         var saleStart = request.saleStart() != null ? request.saleStart() : ticketType.getSaleStart();
@@ -139,7 +158,7 @@ public class TicketTypeService {
                                  .map(update -> {
                                      var ticketType = ticketTypeRepository.findById(update.id())
                                                                           .orElseThrow(() -> new EntityNotFoundException(
-                                                                                  "Ticket type not found with ID: " + update.id()));
+                                                                                  TICKET_TYPE_NOT_FOUND_WITH_ID + update.id()));
 
                                      ticketTypeMapper.updateEntityFromDTO(update.updateRequest(), ticketType);
                                      return ticketType;
@@ -156,7 +175,7 @@ public class TicketTypeService {
         log.debug("Deleting ticket type: {}", id);
 
         var ticketType = ticketTypeRepository.findById(id)
-                                             .orElseThrow(() -> new EntityNotFoundException("Ticket type not found with ID: " + id));
+                                             .orElseThrow(() -> new EntityNotFoundException(TICKET_TYPE_NOT_FOUND_WITH_ID + id));
 
         // Verify no tickets have been sold
         if (ticketType.getQuantitySold() > 0) {
@@ -171,7 +190,7 @@ public class TicketTypeService {
         log.debug("Toggling active status for ticket type: {}", id);
 
         var ticketType = ticketTypeRepository.findById(id)
-                                             .orElseThrow(() -> new EntityNotFoundException("Ticket type not found with ID: " + id));
+                                             .orElseThrow(() -> new EntityNotFoundException(TICKET_TYPE_NOT_FOUND_WITH_ID + id));
 
         ticketType.setIsActive(!Boolean.TRUE.equals(ticketType.getIsActive()));
         ticketType = ticketTypeRepository.save(ticketType);
@@ -185,7 +204,7 @@ public class TicketTypeService {
 
         var updated = ticketTypeRepository.updateQuantitySold(ticketTypeId, quantity);
         if (updated == 0) {
-            throw new EntityNotFoundException("Ticket type not found with ID: " + ticketTypeId);
+            throw new EntityNotFoundException(TICKET_TYPE_NOT_FOUND_WITH_ID + ticketTypeId);
         }
 
         log.debug("Sold quantity updated successfully");
@@ -228,6 +247,51 @@ public class TicketTypeService {
         ticketTypes = ticketTypeRepository.saveAll(ticketTypes);
         log.debug("Reordering completed");
 
+        return ticketTypeMapper.toDTOList(ticketTypes);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TicketTypeDTO> getUncategorizedTicketTypes(Long eventId) {
+        var ticketTypes = ticketTypeRepository.findUncategorizedByEventId(eventId);
+        return ticketTypeMapper.toDTOList(ticketTypes);
+    }
+
+    public List<TicketTypeDTO> moveTicketTypesToCategory(List<Long> ticketTypeIds, Long categoryId) {
+        log.debug("Moving {} ticket types to category: {}", ticketTypeIds.size(), categoryId);
+
+        TicketCategory category;
+        if (categoryId != null) {
+            category = ticketCategoryRepository.findById(categoryId)
+                                               .orElseThrow(() -> new EntityNotFoundException("Ticket category not found with ID: " + categoryId));
+        } else {
+            category = null;
+        }
+
+        var ticketTypes = Stream.ofNullable(ticketTypeIds).flatMap(Collection::stream)
+                                .map(id -> ticketTypeRepository.findById(id)
+                                                               .orElseThrow(() -> new EntityNotFoundException(
+                                                                       TICKET_TYPE_NOT_FOUND_WITH_ID + id)))
+                                .toList();
+
+        // Verify all ticket types belong to the same event as the category (if category is specified)
+        if (category != null) {
+            var eventId = category.getEvent().getId();
+            for (var ticketType : ticketTypes) {
+                if (!ticketType.getEvent().getId().equals(eventId)) {
+                    throw new BusinessException("Ticket type " + ticketType.getId() + " does not belong to the same event as the category");
+                }
+            }
+        }
+
+        if (!ticketTypes.isEmpty()) {
+            ticketTypes.getFirst().setCategory(category);
+        }
+
+        // Update category for all ticket types
+        ticketTypes.forEach(tt -> tt.setCategory(category));
+        ticketTypes = ticketTypeRepository.saveAll(ticketTypes);
+
+        log.debug("Successfully moved {} ticket types to category", ticketTypes.size());
         return ticketTypeMapper.toDTOList(ticketTypes);
     }
 
