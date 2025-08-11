@@ -50,6 +50,7 @@ import lombok.RequiredArgsConstructor;
 @SecurityRequirement(name = "bearerAuth")
 public class OrganizationController {
 
+    public static final String MESSAGE = "message";
     private final OrganizationService organizationService;
 
     /**
@@ -326,7 +327,7 @@ public class OrganizationController {
 
         organizationService.deleteOrganization(id, userId);
 
-        return ResponseEntity.ok(Map.of("message", "Organization deleted successfully"));
+        return ResponseEntity.ok(Map.of(MESSAGE, "Organization deleted successfully"));
 
     }
 
@@ -368,10 +369,10 @@ public class OrganizationController {
 
         if (slugExists) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                                 .body(Map.of("message", "Slug already taken"));
+                                 .body(Map.of(MESSAGE, "Slug already taken"));
         }
 
-        return ResponseEntity.ok(Map.of("message", "Slug available"));
+        return ResponseEntity.ok(Map.of(MESSAGE, "Slug available"));
 
     }
 
