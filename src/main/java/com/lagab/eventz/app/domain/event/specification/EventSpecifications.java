@@ -19,6 +19,13 @@ import jakarta.persistence.criteria.Predicate;
 
 public class EventSpecifications {
 
+    public static final String ADDRESS = "address";
+    public static final String POWER = "POWER";
+
+    private EventSpecifications() {
+        // Utility class
+    }
+
     // Returns a specification to filter events containing the keyword in name or description
     public static Specification<Event> hasKeyword(String keyword) {
         return (root, query, criteriaBuilder) -> {
@@ -59,7 +66,7 @@ public class EventSpecifications {
             if (city == null || city.trim().isEmpty()) {
                 return criteriaBuilder.conjunction(); // No filter if city is empty
             }
-            Join<Event, Address> addressJoin = root.join("address", JoinType.LEFT);
+            Join<Event, Address> addressJoin = root.join(ADDRESS, JoinType.LEFT);
 
             return criteriaBuilder.equal(
                     criteriaBuilder.lower(addressJoin.get("city")),
@@ -119,15 +126,15 @@ public class EventSpecifications {
                             Double.class,
                             criteriaBuilder.sum(
                                     criteriaBuilder.function(
-                                            "POWER",
+                                            POWER,
                                             Double.class,
-                                            criteriaBuilder.diff(root.get("address").get("latitude"), latitude),
+                                            criteriaBuilder.diff(root.get(ADDRESS).get("latitude"), latitude),
                                             criteriaBuilder.literal(2)
                                     ),
                                     criteriaBuilder.function(
-                                            "POWER",
+                                            POWER,
                                             Double.class,
-                                            criteriaBuilder.diff(root.get("address").get("longitude"), longitude),
+                                            criteriaBuilder.diff(root.get(ADDRESS).get("longitude"), longitude),
                                             criteriaBuilder.literal(2)
                                     )
                             )
@@ -174,7 +181,7 @@ public class EventSpecifications {
             List<Predicate> predicates = new ArrayList<>();
 
             // Keyword search
-            if (searchDTO.keyword() != null && !searchDTO.keyword().trim().isEmpty()) {
+            if (StringUtils.isNoneEmpty(searchDTO.keyword()) && !searchDTO.keyword().trim().isEmpty()) {
                 String likePattern = "%" + searchDTO.keyword().toLowerCase() + "%";
                 Predicate keywordPredicate = criteriaBuilder.or(
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern),
@@ -196,7 +203,7 @@ public class EventSpecifications {
             // City filter
             if (searchDTO.city() != null && !searchDTO.city().trim().isEmpty()) {
                 predicates.add(criteriaBuilder.equal(
-                        criteriaBuilder.lower(root.get("address").get("city")),
+                        criteriaBuilder.lower(root.get(ADDRESS).get("city")),
                         searchDTO.city().toLowerCase()
                 ));
             }
@@ -242,15 +249,15 @@ public class EventSpecifications {
                                 Double.class,
                                 criteriaBuilder.sum(
                                         criteriaBuilder.function(
-                                                "POWER",
+                                                POWER,
                                                 Double.class,
-                                                criteriaBuilder.diff(root.get("address").get("latitude"), searchDTO.latitude()),
+                                                criteriaBuilder.diff(root.get(ADDRESS).get("latitude"), searchDTO.latitude()),
                                                 criteriaBuilder.literal(2)
                                         ),
                                         criteriaBuilder.function(
-                                                "POWER",
+                                                POWER,
                                                 Double.class,
-                                                criteriaBuilder.diff(root.get("address").get("longitude"), searchDTO.longitude()),
+                                                criteriaBuilder.diff(root.get(ADDRESS).get("longitude"), searchDTO.longitude()),
                                                 criteriaBuilder.literal(2)
                                         )
                                 )

@@ -652,52 +652,6 @@ class EventSpecificationsTest {
             verify(criteriaBuilder).and(any(Predicate[].class));
             assertEquals(mockPredicate, result);
         }
-
-        private void setupCompleteWithCriteriaMocks(LocalDateTime startDate, LocalDateTime endDate) {
-            // Setup all paths and expressions needed for withCriteria test
-            Path<String> namePath = mock(Path.class);
-            Path<String> descriptionPath = mock(Path.class);
-            Path<EventType> typePath = mock(Path.class);
-            Path<EventStatus> statusPath = mock(Path.class);
-            Path<Object> addressPath = mock(Path.class);
-            Path<String> cityPath = mock(Path.class);
-            Path<LocalDateTime> startDatePath = mock(Path.class);
-            Path<LocalDateTime> endDatePath = mock(Path.class);
-            Path<Boolean> isFreePath = mock(Path.class);
-            Path<Boolean> isPublicPath = mock(Path.class);
-            Path<Object> organizerPath = mock(Path.class);
-            Path<Long> organizerIdPath = mock(Path.class);
-
-            Expression<String> lowerNameExpression = mock(Expression.class);
-            Expression<String> lowerDescExpression = mock(Expression.class);
-            Expression<String> lowerCityExpression = mock(Expression.class);
-
-            when(root.get("name")).thenReturn((Path) namePath);
-            when(root.get("description")).thenReturn((Path) descriptionPath);
-            when(root.get("type")).thenReturn((Path) typePath);
-            when(root.get("status")).thenReturn((Path) statusPath);
-            when(root.get("address")).thenReturn(addressPath);
-            when(root.get("startDate")).thenReturn((Path) startDatePath);
-            when(root.get("endDate")).thenReturn((Path) endDatePath);
-            when(root.get("isFree")).thenReturn((Path) isFreePath);
-            when(root.get("isPublic")).thenReturn((Path) isPublicPath);
-            when(root.get("organizer")).thenReturn(organizerPath);
-
-            when(addressPath.get("city")).thenReturn((Path) cityPath);
-            when(organizerPath.get("id")).thenReturn((Path) organizerIdPath);
-
-            when(criteriaBuilder.lower(namePath)).thenReturn(lowerNameExpression);
-            when(criteriaBuilder.lower(descriptionPath)).thenReturn(lowerDescExpression);
-            when(criteriaBuilder.lower(cityPath)).thenReturn(lowerCityExpression);
-
-            when(criteriaBuilder.like(any(Expression.class), anyString())).thenReturn(mock(Predicate.class));
-            when(criteriaBuilder.or(any(Predicate.class), any(Predicate.class))).thenReturn(mock(Predicate.class));
-            when(criteriaBuilder.equal(any(Expression.class), any())).thenReturn(mock(Predicate.class));
-            when(criteriaBuilder.greaterThanOrEqualTo(startDatePath, startDate)).thenReturn(mock(Predicate.class));
-            when(criteriaBuilder.lessThanOrEqualTo(endDatePath, endDate)).thenReturn(mock(Predicate.class));
-            when(criteriaBuilder.isTrue(isPublicPath)).thenReturn(mock(Predicate.class));
-            when(criteriaBuilder.and(any(Predicate[].class))).thenReturn(mockPredicate);
-        }
     }
 
     @Nested

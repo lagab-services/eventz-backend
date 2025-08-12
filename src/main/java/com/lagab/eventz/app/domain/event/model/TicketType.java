@@ -1,9 +1,7 @@
-package com.lagab.eventz.app.domain.ticket.entity;
+package com.lagab.eventz.app.domain.event.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import com.lagab.eventz.app.domain.event.model.Event;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,6 +70,7 @@ public class TicketType {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-   /* @OneToMany(mappedBy = "ticketType", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems;*/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private TicketCategory category;
 }
