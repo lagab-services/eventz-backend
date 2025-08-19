@@ -2,7 +2,7 @@ package com.lagab.eventz.app.domain.order.model;
 
 import java.math.BigDecimal;
 
-import com.lagab.eventz.app.domain.ticket.entity.TicketType;
+import com.lagab.eventz.app.domain.event.model.TicketType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
@@ -229,7 +230,7 @@ public class TicketTypeService {
         var ticketTypes = ticketTypeRepository.findByEventIdOrderBySortOrderAscIdAsc(eventId);
 
         // Verify all IDs belong to the event
-        var existingIds = ticketTypes.stream().map(TicketType::getId).toList();
+        var existingIds = ticketTypes.stream().map(TicketType::getId).collect(Collectors.toSet());
         if (!existingIds.containsAll(ticketTypeIds)) {
             throw new BusinessException("Some ticket types don't belong to this event");
         }

@@ -58,9 +58,15 @@ public record TicketTypeDTO(
         BigDecimal totalPrice,
 
         @Schema(description = "Indicates if tickets are currently on sale (based on sale dates and availability)", example = "true")
-        Boolean isOnSale,
+        boolean isOnSale,
 
         @Schema(description = "Indicates if all tickets of this type have been sold out", example = "false")
-        Boolean isSoldOut
+        boolean isSoldOut,
+
+        @Schema(description = "ID of the event this ticket type belongs to", example = "456")
+        Long eventId,
+
+        @Schema(description = "Name of the event this ticket type belongs to", example = "Festival")
+        String eventName
 ) {
 }

@@ -140,7 +140,9 @@ class TicketTypeServiceTest {
                 100, // quantityRemaining (computed)
                 BigDecimal.ZERO, // totalPrice (computed: price * quantitySold)
                 true, // isOnSale (computed)
-                false // isSoldOut (computed)
+                false, // isSoldOut (computed)
+                1L, // event ID
+                "event Name" // event Name
         );
     }
 

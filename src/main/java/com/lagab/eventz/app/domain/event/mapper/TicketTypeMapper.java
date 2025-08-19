@@ -32,6 +32,8 @@ public interface TicketTypeMapper {
     @Mapping(target = "totalPrice", source = ".", qualifiedByName = "calculateTotalPrice")
     @Mapping(target = "isOnSale", source = ".", qualifiedByName = "calculateIsOnSale")
     @Mapping(target = "isSoldOut", source = ".", qualifiedByName = "calculateIsSoldOut")
+    @Mapping(target = "eventId", source = "event.id")
+    @Mapping(target = "eventName", source = "event.name")
     TicketTypeDTO toDTO(TicketType ticketType);
 
     List<TicketTypeDTO> toDTOList(List<TicketType> ticketTypes);
@@ -70,7 +72,7 @@ public interface TicketTypeMapper {
     }
 
     @Named("calculateIsOnSale")
-    default Boolean calculateIsOnSale(TicketType ticketType) {
+    default boolean calculateIsOnSale(TicketType ticketType) {
         if (ticketType == null || !Boolean.TRUE.equals(ticketType.getIsActive())) {
             return false;
         }
@@ -81,7 +83,7 @@ public interface TicketTypeMapper {
     }
 
     @Named("calculateIsSoldOut")
-    default Boolean calculateIsSoldOut(TicketType ticketType) {
+    default boolean calculateIsSoldOut(TicketType ticketType) {
         if (ticketType == null || ticketType.getQuantityAvailable() == null) {
             return false;
         }

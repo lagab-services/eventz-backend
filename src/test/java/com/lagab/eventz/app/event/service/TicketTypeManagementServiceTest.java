@@ -284,6 +284,7 @@ class TicketTypeManagementServiceTest {
                               .doesNotContainKey("VIP");
         }
     }
+
     // Helper methods
     private void setupMockData() {
         TicketTypeDTO vipTicket = createTicketTypeDTO(1L, "VIP Ticket", 1L, "VIP");
@@ -339,7 +340,9 @@ class TicketTypeManagementServiceTest {
                 remaining,                             // quantityRemaining (computed)
                 totalPrice,                            // totalPrice (computed)
                 isActive && remaining > 0,             // isOnSale (computed)
-                remaining <= 0                         // isSoldOut (computed)
+                remaining <= 0,                         // isSoldOut (computed)
+                1L,                                     // event ID
+                "event Name"                            // event Name
         );
     }
 }
