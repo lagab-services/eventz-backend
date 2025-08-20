@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.domain.order.exception;
+package com.lagab.eventz.app.domain.cart.exception;
 
 import com.lagab.eventz.app.common.exception.BusinessException;
 
