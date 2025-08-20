@@ -12,9 +12,11 @@ public record CartResponse(
         List<CartItemResponse> items,
         BigDecimal subtotal,
         BigDecimal fees,
+        BigDecimal discount,
         BigDecimal total,
         int totalItems,
         LocalDateTime updatedAt,
+        String promoCode,
 
         // Validation information
         boolean isValid,

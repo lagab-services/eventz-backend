@@ -25,9 +25,11 @@ public interface CartMapper {
     @Mapping(target = "items", source = "cart.items")
     @Mapping(target = "subtotal", source = "cart.subtotal")
     @Mapping(target = "fees", source = "cart.fees")
+    @Mapping(target = "discount", source = "cart.discount")
     @Mapping(target = "total", source = "cart.total")
     @Mapping(target = "totalItems", source = "cart.totalItems")
     @Mapping(target = "updatedAt", source = "cart.updatedAt")
+    @Mapping(target = "promoCode", source = "cart.promoCode")
     @Mapping(target = "isValid", source = "valid")
     @Mapping(target = "warnings", source = "warnings")
     @Mapping(target = "errors", source = "errors")
@@ -54,7 +56,9 @@ public interface CartMapper {
                 null,
                 null,
                 null,
+                null,
                 0,
+                null,
                 null,
                 false,
                 List.of(),
@@ -69,7 +73,9 @@ public interface CartMapper {
                 null,
                 null,
                 null,
+                null,
                 0,
+                null,
                 null,
                 errors.isEmpty(),
                 warnings,

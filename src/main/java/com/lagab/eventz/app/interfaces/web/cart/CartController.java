@@ -193,6 +193,27 @@ public class CartController {
         return ResponseEntity.ok(cartMapper.toCartResponse(validationResult));
     }
 
+    @PostMapping("/promo")
+    @Operation(summary = "Apply or remove promo code", description = "Apply a promotion code to the cart. Pass an empty code to remove it.")
+    @ApiResponse(responseCode = "200", description = "Promo applied successfully")
+    public ResponseEntity<CartResponse> applyPromo(
+            HttpServletRequest request,
+            @RequestParam(name = "code", required = false) String code) {
+        try {
+            String sessionId = getSessionId(request);
+            Long userId = SecurityUtils.getCurrentUserIdOrNull();
+            Cart cart = cartService.applyPromoCode(sessionId, userId, code);
+            return ResponseEntity.ok(mapToCartResponse(cart));
+        } catch (CartException e) {
+            CartMessage errorMessage = CartMessage.error(
+                    CartErrorCode.VALIDATION_ERROR,
+                    e.getMessage(),
+                    Map.of("code", code)
+            );
+            return ResponseEntity.badRequest().body(cartMapper.createErrorResponse(errorMessage));
+        }
+    }
+
     private String getSessionId(HttpServletRequest request) {
         return request.getSession().getId();
     }
@@ -206,12 +227,14 @@ public class CartController {
                 items,
                 cart.getSubtotal(),
                 cart.getFees(),
+                cart.getDiscount(),
                 cart.getTotal(),
                 cart.getTotalItems(),
                 cart.getUpdatedAt(),
-                true, // isValid - you might want to add validation logic
-                new ArrayList<>(), // warnings
-                new ArrayList<>()  // errors
+                cart.getPromoCode(),
+                true,
+                new ArrayList<>(),
+                new ArrayList<>()
         );
     }
 

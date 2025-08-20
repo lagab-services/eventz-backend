@@ -19,7 +19,9 @@ public class Cart {
     private List<CartItem> items = new ArrayList<>();
     private BigDecimal subtotal = BigDecimal.ZERO;
     private BigDecimal fees = BigDecimal.ZERO;
+    private BigDecimal discount = BigDecimal.ZERO;
     private BigDecimal total = BigDecimal.ZERO;
+    private String promoCode;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
 
@@ -70,10 +72,21 @@ public class Cart {
 
         // Calculate fees (3% of subtotal + €1 fixed fee)
         fees = subtotal.multiply(BigDecimal.valueOf(0.03))
-                       .add(BigDecimal.ONE)  // Using BigDecimal.ONE instead of valueOf(1.0)
+                       .add(BigDecimal.ONE)
                        .setScale(2, RoundingMode.HALF_UP);
 
-        total = subtotal.add(fees);
+        if (discount == null) {
+            discount = BigDecimal.ZERO;
+        }
+        if (discount.compareTo(BigDecimal.ZERO) < 0) {
+            discount = BigDecimal.ZERO;
+        }
+
+        BigDecimal gross = subtotal.add(fees);
+        if (discount.compareTo(gross) > 0) {
+            discount = gross;
+        }
+        total = gross.subtract(discount).setScale(2, RoundingMode.HALF_UP);
         updatedAt = LocalDateTime.now();
     }
 

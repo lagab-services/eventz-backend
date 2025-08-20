@@ -1,12 +1,8 @@
 package com.lagab.eventz.app.cart.service;
 
-import com.lagab.eventz.app.domain.cart.exception.CartException;
-import com.lagab.eventz.app.domain.cart.model.Cart;
-import com.lagab.eventz.app.domain.cart.model.CartValidationResult;
-import com.lagab.eventz.app.domain.cart.service.CartService;
-import com.lagab.eventz.app.domain.cart.service.CartValidationService;
-import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
-import com.lagab.eventz.app.domain.event.service.TicketTypeService;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,11 +10,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import com.lagab.eventz.app.domain.cart.exception.CartException;
+import com.lagab.eventz.app.domain.cart.model.Cart;
+import com.lagab.eventz.app.domain.cart.model.CartValidationResult;
+import com.lagab.eventz.app.domain.cart.service.CartService;
+import com.lagab.eventz.app.domain.cart.service.CartValidationService;
+import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
+import com.lagab.eventz.app.domain.event.service.TicketTypeService;
+import com.lagab.eventz.app.domain.promotion.service.PromotionService;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CartServiceTest {
@@ -28,6 +38,9 @@ class CartServiceTest {
 
     @Mock
     private CartValidationService cartValidationService;
+
+    @Mock
+    private PromotionService promotionService;
 
     @InjectMocks
     private CartService cartService;

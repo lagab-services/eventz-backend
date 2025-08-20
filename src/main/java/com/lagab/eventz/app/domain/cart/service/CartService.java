@@ -11,6 +11,7 @@ import com.lagab.eventz.app.domain.cart.model.CartItem;
 import com.lagab.eventz.app.domain.cart.model.CartValidationResult;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.service.TicketTypeService;
+import com.lagab.eventz.app.domain.promotion.service.PromotionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ public class CartService {
 
     private final TicketTypeService ticketTypeService;
     private final CartValidationService cartValidationService;
+    private final PromotionService promotionService;
 
     public Cart getOrCreateCart(String sessionId, Long userId) {
         String cartKey = userId != null ? USER + userId : SESSION + sessionId;
@@ -94,8 +96,14 @@ public class CartService {
         Cart cart = getOrCreateCart(sessionId, userId);
         CartValidationResult result = cartValidationService.validateCart(cart);
 
+        // Recalculate promo if anything changed or as a safety measure
+        promotionService.recalculate(cart);
+
         if (result.isHasChanges()) {
             cart.calculateTotals();
+            saveCart(cart);
+        } else {
+            // ensure cart is persisted if promo recalculated changed totals
             saveCart(cart);
         }
         return result;
@@ -123,5 +131,12 @@ public class CartService {
     private void saveCart(Cart cart) {
         String cartKey = cart.getUserId() != null ? USER + cart.getUserId() : SESSION + cart.getSessionId();
         cartCache.put(cartKey, cart);
+    }
+
+    public Cart applyPromoCode(String sessionId, Long userId, String promoCode) {
+        Cart cart = getOrCreateCart(sessionId, userId);
+        promotionService.applyPromoCode(cart, promoCode);
+        saveCart(cart);
+        return cart;
     }
 }
