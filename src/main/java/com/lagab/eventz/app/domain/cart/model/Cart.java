@@ -74,6 +74,7 @@ public class Cart {
         fees = subtotal.multiply(BigDecimal.valueOf(0.03))
                        .add(BigDecimal.ONE)
                        .setScale(2, RoundingMode.HALF_UP);
+        fees = BigDecimal.ZERO;
 
         if (discount == null) {
             discount = BigDecimal.ZERO;

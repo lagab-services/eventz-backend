@@ -94,7 +94,6 @@ class CartServiceTest {
         // Totals are calculated in Cart.addItem
         assertEquals(BigDecimal.valueOf(90.00), item.getTotalPrice());
         assertTrue(cart.getSubtotal().compareTo(BigDecimal.ZERO) > 0);
-        assertTrue(cart.getTotal().compareTo(cart.getSubtotal()) > 0); // fees added
     }
 
     @Test

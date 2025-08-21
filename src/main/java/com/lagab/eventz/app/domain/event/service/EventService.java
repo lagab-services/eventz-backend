@@ -157,7 +157,7 @@ public class EventService {
     }
 
     // Private helper methods
-    private Event findEventById(Long id) {
+    public Event findEventById(Long id) {
         return eventRepository.findById(id)
                               .orElseThrow(() -> new EventNotFoundException("Event not found with ID: " + id));
     }

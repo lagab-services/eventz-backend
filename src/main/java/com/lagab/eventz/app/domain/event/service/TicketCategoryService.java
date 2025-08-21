@@ -1,6 +1,7 @@
 package com.lagab.eventz.app.domain.event.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,11 +74,14 @@ public class TicketCategoryService {
         return ticketCategoryMapper.toDTO(ticketCategory);
     }
 
+    public TicketCategory getTicketCategory(Long id) {
+        return ticketCategoryRepository.findByIdWithTicketTypes(id)
+                                       .orElseThrow(() -> new EntityNotFoundException(TICKET_CATEGORY_NOT_FOUND_WITH_ID + id));
+    }
+
     @Transactional(readOnly = true)
     public TicketCategoryDTO getTicketCategoryById(Long id) {
-        var ticketCategory = ticketCategoryRepository.findByIdWithTicketTypes(id)
-                                                     .orElseThrow(() -> new EntityNotFoundException(TICKET_CATEGORY_NOT_FOUND_WITH_ID + id));
-        return ticketCategoryMapper.toDTO(ticketCategory);
+        return ticketCategoryMapper.toDTO(getTicketCategory(id));
     }
 
     @Transactional(readOnly = true)
@@ -163,7 +167,7 @@ public class TicketCategoryService {
         var ticketCategories = ticketCategoryRepository.findByEventIdOrderByDisplayOrderAscIdAsc(eventId);
 
         // Verify all IDs belong to the event
-        var existingIds = ticketCategories.stream().map(TicketCategory::getId).toList();
+        var existingIds = ticketCategories.stream().map(TicketCategory::getId).collect(Collectors.toSet());
         if (!existingIds.containsAll(categoryIds)) {
             throw new BusinessException("Some ticket categories don't belong to this event");
         }
