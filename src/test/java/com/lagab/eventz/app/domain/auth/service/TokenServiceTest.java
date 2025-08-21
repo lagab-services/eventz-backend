@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.auth.service;
+package com.lagab.eventz.app.domain.auth.service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.lagab.eventz.app.domain.auth.service.TokenService;
 import com.lagab.eventz.app.domain.user.model.Token;
 import com.lagab.eventz.app.domain.user.model.User;
 import com.lagab.eventz.app.domain.user.repository.TokenRepository;

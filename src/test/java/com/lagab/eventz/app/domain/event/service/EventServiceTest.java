@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.event.service;
+package com.lagab.eventz.app.domain.event.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,8 +42,6 @@ import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
 import com.lagab.eventz.app.domain.event.model.TicketType;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
-import com.lagab.eventz.app.domain.event.service.AddressService;
-import com.lagab.eventz.app.domain.event.service.EventService;
 import com.lagab.eventz.app.domain.org.model.Organization;
 import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.model.Role;

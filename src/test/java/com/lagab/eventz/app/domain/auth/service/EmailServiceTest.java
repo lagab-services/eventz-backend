@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.auth.service;
+package com.lagab.eventz.app.domain.auth.service;
 
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -15,7 +15,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.lagab.eventz.app.domain.auth.service.EmailService;
 import com.lagab.eventz.app.domain.user.model.User;
 
 import jakarta.mail.MessagingException;

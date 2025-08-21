@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.event.service;
+package com.lagab.eventz.app.domain.event.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,9 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.category.TicketCategoryDTO;
-import com.lagab.eventz.app.domain.event.service.TicketCategoryService;
-import com.lagab.eventz.app.domain.event.service.TicketTypeManagementService;
-import com.lagab.eventz.app.domain.event.service.TicketTypeService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.event.service;
+package com.lagab.eventz.app.domain.event.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,7 +28,6 @@ import com.lagab.eventz.app.domain.event.projection.TicketTypeStatsProjection;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
 import com.lagab.eventz.app.domain.event.repository.TicketCategoryRepository;
 import com.lagab.eventz.app.domain.event.repository.TicketTypeRepository;
-import com.lagab.eventz.app.domain.event.service.TicketTypeService;
 
 import jakarta.persistence.EntityNotFoundException;
 

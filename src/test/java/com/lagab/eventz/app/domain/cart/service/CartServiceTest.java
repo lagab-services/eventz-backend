@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.cart.service;
+package com.lagab.eventz.app.domain.cart.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,8 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.lagab.eventz.app.domain.cart.exception.CartException;
 import com.lagab.eventz.app.domain.cart.model.Cart;
 import com.lagab.eventz.app.domain.cart.model.CartValidationResult;
-import com.lagab.eventz.app.domain.cart.service.CartService;
-import com.lagab.eventz.app.domain.cart.service.CartValidationService;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.service.TicketTypeService;
 import com.lagab.eventz.app.domain.promotion.service.PromotionService;

@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.org.service;
+package com.lagab.eventz.app.domain.org.service;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,6 @@ import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 import com.lagab.eventz.app.domain.org.model.OrganizationRolePermission;
 import com.lagab.eventz.app.domain.org.repository.OrganizationMembershipRepository;
 import com.lagab.eventz.app.domain.org.repository.OrganizationRolePermissionRepository;
-import com.lagab.eventz.app.domain.org.service.OrganizationPermissionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

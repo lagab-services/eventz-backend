@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.auth.service;
+package com.lagab.eventz.app.domain.auth.service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.lagab.eventz.app.domain.auth.model.ApiKey;
 import com.lagab.eventz.app.domain.auth.repository.ApiKeyRepository;
-import com.lagab.eventz.app.domain.auth.service.ApiKeyService;
 import com.lagab.eventz.app.domain.user.model.Role;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

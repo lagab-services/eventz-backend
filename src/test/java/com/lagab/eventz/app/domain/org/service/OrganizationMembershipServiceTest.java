@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.org.service;
+package com.lagab.eventz.app.domain.org.service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -30,8 +30,6 @@ import com.lagab.eventz.app.domain.org.model.OrganizationMembership;
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 import com.lagab.eventz.app.domain.org.repository.InvitationRepository;
 import com.lagab.eventz.app.domain.org.repository.OrganizationMembershipRepository;
-import com.lagab.eventz.app.domain.org.service.OrganizationMembershipService;
-import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.model.User;
 import com.lagab.eventz.app.domain.user.repository.UserRepository;
 

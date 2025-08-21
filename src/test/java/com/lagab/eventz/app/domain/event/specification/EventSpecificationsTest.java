@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.event.specification;
+package com.lagab.eventz.app.domain.event.specification;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,6 @@ import com.lagab.eventz.app.domain.event.model.Address;
 import com.lagab.eventz.app.domain.event.model.Event;
 import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
-import com.lagab.eventz.app.domain.event.specification.EventSpecifications;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

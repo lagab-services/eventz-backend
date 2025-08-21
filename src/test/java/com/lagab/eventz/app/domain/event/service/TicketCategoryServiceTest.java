@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.event.service;
+package com.lagab.eventz.app.domain.event.service;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +23,6 @@ import com.lagab.eventz.app.domain.event.model.TicketCategory;
 import com.lagab.eventz.app.domain.event.model.TicketType;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
 import com.lagab.eventz.app.domain.event.repository.TicketCategoryRepository;
-import com.lagab.eventz.app.domain.event.service.TicketCategoryService;
 
 import jakarta.persistence.EntityNotFoundException;
 

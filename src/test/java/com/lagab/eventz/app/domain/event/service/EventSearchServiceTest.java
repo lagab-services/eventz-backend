@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.event.service;
+package com.lagab.eventz.app.domain.event.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +22,6 @@ import com.lagab.eventz.app.domain.event.model.Event;
 import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
-import com.lagab.eventz.app.domain.event.service.EventSearchService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;

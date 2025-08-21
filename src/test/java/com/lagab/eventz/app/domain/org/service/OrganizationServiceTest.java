@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.org.service;
+package com.lagab.eventz.app.domain.org.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,8 +20,6 @@ import com.lagab.eventz.app.domain.org.model.OrganizationMembership;
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
 import com.lagab.eventz.app.domain.org.repository.OrganizationMembershipRepository;
 import com.lagab.eventz.app.domain.org.repository.OrganizationRepository;
-import com.lagab.eventz.app.domain.org.service.OrganizationPermissionService;
-import com.lagab.eventz.app.domain.org.service.OrganizationService;
 import com.lagab.eventz.app.domain.user.model.User;
 
 import jakarta.persistence.EntityNotFoundException;

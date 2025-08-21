@@ -1,4 +1,4 @@
-package com.lagab.eventz.app.org.service;
+package com.lagab.eventz.app.domain.org.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,10 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.lagab.eventz.app.domain.org.model.OrganizationPermission;
 import com.lagab.eventz.app.domain.org.model.OrganizationRole;
-import com.lagab.eventz.app.domain.org.service.OrganizationMembershipService;
-import com.lagab.eventz.app.domain.org.service.OrganizationPermissionService;
-import com.lagab.eventz.app.domain.org.service.OrganizationSecurityService;
-import com.lagab.eventz.app.domain.org.service.OrganizationService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
