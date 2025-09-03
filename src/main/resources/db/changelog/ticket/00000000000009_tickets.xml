@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd" objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="tickets-0001" author="lagab">
+        <createTable tableName="tickets">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_tickets" nullable="false"/>
+            </column>
+            <column name="ticket_code" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="qr_code" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="checked_in" type="BOOLEAN"/>
+            <column name="check_in_time" type="DATETIME"/>
+            <column name="created_at" type="DATETIME"/>
+            <column name="ticket_type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="tickets-0002" author="lagab">
+        <addForeignKeyConstraint baseTableName="tickets"
+                                 baseColumnNames="ticket_type_id"
+                                 constraintName="fk_tickets_ticket_type"
+                                 referencedTableName="ticket_types"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="tickets-0003" author="lagab">
+        <addForeignKeyConstraint baseTableName="tickets"
+                                 baseColumnNames="event_id"
+                                 constraintName="fk_tickets_event"
+                                 referencedTableName="events"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- <changeSet id="tickets-idx-0001" author="lagab">
+         <createIndex indexName="idx_tickets_order_id" tableName="tickets">
+             <column name="order_id"/>
+         </createIndex>
+     </changeSet>
+
+     <changeSet id="tickets-idx-0002" author="lagab">
+         <createIndex indexName="idx_tickets_ticket_type_id" tableName="tickets">
+             <column name="ticket_type_id"/>
+         </createIndex>
+     </changeSet>
+
+    <changeSet id="tickets-idx-0003" author="lagab">
+        <createIndex indexName="idx_tickets_event_id" tableName="tickets">
+            <column name="event_id"/>
+        </createIndex>
+    </changeSet>-->
+
+</databaseChangeLog>
