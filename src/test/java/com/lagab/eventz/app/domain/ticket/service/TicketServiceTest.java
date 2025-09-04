@@ -242,8 +242,7 @@ class TicketServiceTest {
             List<Ticket> capturedTickets = ticketsCaptor.getValue();
 
             // First ticket should have attendee
-            assertEquals(testAttendee1, capturedTickets.get(0).getAttendee());
-            assertEquals(capturedTickets.get(0), testAttendee1.getTicket());
+            assertEquals(testAttendee1, capturedTickets.getFirst().getAttendee());
 
             // Other tickets should not have attendees
             assertNull(capturedTickets.get(1).getAttendee());
@@ -562,7 +561,6 @@ class TicketServiceTest {
             // Only first attendee should be assigned
             Ticket ticket = result.getFirst();
             assertEquals(testAttendee1, ticket.getAttendee());
-            assertEquals(ticket, testAttendee1.getTicket());
         }
 
         @Test

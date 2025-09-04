@@ -39,6 +39,7 @@ public class TicketService {
                 ticket.setTicketCode(generateTicketCode());
                 ticket.setQrCode(generateQRCode());
                 ticket.setOrder(order);
+                ticket.setEvent(order.getEvent());
                 ticket.setTicketType(orderItem.getTicketType());
                 ticket.setStatus(TicketStatus.VALID);
                 ticket.setCheckedIn(false);
@@ -47,7 +48,6 @@ public class TicketService {
                 // Associate an existing attendee if any remain
                 if (attendeeIndex < unassignedAttendees.size()) {
                     Attendee attendee = unassignedAttendees.get(attendeeIndex++);
-                    attendee.setTicket(ticket);
                     ticket.setAttendee(attendee);
                 }
 

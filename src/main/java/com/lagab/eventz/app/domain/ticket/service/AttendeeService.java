@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lagab.eventz.app.common.exception.BusinessException;
 import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
@@ -26,6 +27,7 @@ import com.lagab.eventz.app.domain.ticket.entity.AttendeeCustomField;
 import com.lagab.eventz.app.domain.ticket.entity.CheckInStatus;
 import com.lagab.eventz.app.domain.ticket.entity.Ticket;
 import com.lagab.eventz.app.domain.ticket.repository.AttendeeRepository;
+import com.lagab.eventz.app.domain.ticket.repository.TicketRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +36,9 @@ import lombok.RequiredArgsConstructor;
 public class AttendeeService {
     private final AttendeeRepository attendeeRepository;
     private final EventCustomFieldRepository eventCustomFieldRepository;
+    private final TicketRepository ticketRepository;
 
-    public void createAttendee(AttendeeInfo request, Order order, Ticket ticket) {
+    public void createAttendee(AttendeeInfo request, Order order) {
         // Validate custom fields
         validateCustomFields(request.customFields(), order.getEvent().getId(), request.ticketTypeId());
 
@@ -43,7 +46,6 @@ public class AttendeeService {
         attendee.setFirstName(request.firstName());
         attendee.setLastName(request.lastName());
         attendee.setEmail(request.email());
-        attendee.setTicket(ticket);
         attendee.setOrder(order);
         attendee.setEvent(order.getEvent());
 
@@ -67,16 +69,17 @@ public class AttendeeService {
     }
 
     private Attendee getAttendee(Long attendeeId) {
-        Attendee attendee = attendeeRepository.findById(attendeeId)
-                                              .orElseThrow(() -> new ResourceNotFoundException("Attendee not found"));
-        return attendee;
+        return attendeeRepository.findById(attendeeId)
+                                 .orElseThrow(() -> new ResourceNotFoundException("Attendee not found"));
     }
 
+    @Transactional(readOnly = true)
     public Page<AttendeeResponse> getEventAttendees(Long eventId, Pageable pageable) {
         return attendeeRepository.findByEventId(eventId, pageable)
                                  .map(this::mapToResponse);
     }
 
+    @Transactional(readOnly = true)
     public AttendeeStatistics getEventStatistics(Long eventId) {
         List<Attendee> attendees = attendeeRepository.findByEventId(eventId);
 
@@ -90,7 +93,10 @@ public class AttendeeService {
 
         Map<String, Long> attendeesByTicketType = attendees.stream()
                                                            .collect(Collectors.groupingBy(
-                                                                   a -> a.getTicket().getTicketType().getName(),
+                                                                   a -> ticketRepository.findByAttendeeId(a.getId())
+                                                                                        .orElseThrow()
+                                                                                        .getTicketType()
+                                                                                        .getName(),
                                                                    Collectors.counting()
                                                            ));
 
@@ -102,10 +108,14 @@ public class AttendeeService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<Attendee> findUnassignedAttendees(Long orderId) {
-        return attendeeRepository.findByOrderIdAndTicketIsNull(orderId);
+        return attendeeRepository.findByOrderId(orderId).stream()
+                                 .filter(a -> ticketRepository.findByAttendeeId(a.getId()).isEmpty())
+                                 .toList();
     }
 
+    @Transactional
     public AttendeeResponse updateAttendee(Long attendeeId, AttendeeInfo request) {
         Attendee attendee = getAttendee(attendeeId);
 
@@ -137,15 +147,20 @@ public class AttendeeService {
         newAttendee.setFirstName(request.firstName());
         newAttendee.setLastName(request.lastName());
         newAttendee.setEmail(request.email());
-        newAttendee.setTicket(currentAttendee.getTicket());
         newAttendee.setOrder(currentAttendee.getOrder());
         newAttendee.setEvent(currentAttendee.getEvent());
 
+        // Save new attendee first to get ID
+        newAttendee = attendeeRepository.save(newAttendee);
+
+        // Reassign ticket from current attendee to new attendee
+        Ticket ticket = ticketRepository.findByAttendeeId(currentAttendee.getId())
+                                        .orElseThrow(() -> new ResourceNotFoundException("Ticket not found for attendee"));
+        ticket.setAttendee(newAttendee);
+        ticketRepository.save(ticket);
+
         // Delete old attendee
         attendeeRepository.delete(currentAttendee);
-
-        // Save new attendee
-        newAttendee = attendeeRepository.save(newAttendee);
 
         // Todo: Send notification emails
         //emailService.sendTransferNotificationEmail(currentAttendee, newAttendee);
@@ -226,13 +241,16 @@ public class AttendeeService {
                                                            AttendeeCustomField::getFieldValue
                                                    ));
 
+        Ticket ticket = ticketRepository.findByAttendeeId(attendee.getId())
+                                        .orElse(null);
+
         return new AttendeeResponse(
                 attendee.getId(),
                 attendee.getFirstName(),
                 attendee.getLastName(),
                 attendee.getEmail(),
-                attendee.getTicket().getTicketCode(),
-                attendee.getTicket().getTicketType().getName(),
+                ticket != null ? ticket.getTicketCode() : null,
+                ticket != null ? ticket.getTicketType().getName() : null,
                 attendee.getCheckInStatus(),
                 customFields
         );

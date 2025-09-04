@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final StripeService stripeService;
 
     public Payment buildPaymentSuccess(Order order, Session stripeSession) {
         // Create payment record
@@ -39,16 +40,13 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    // Todo: to implement
+    // Todo: create new payment line
     public Payment refundPayment(Order order) {
         Payment originalPayment = paymentRepository.findByOrderIdAndStatus(order.getId(), PaymentStatus.COMPLETED)
                                                    .orElseThrow(() -> new RuntimeException("Original payment not found"));
 
         try {
-            /*PaymentResult refundResult = stripeProvider.refundPayment(
-                    originalPayment.getPaymentIntentId(),
-                    originalPayment.getAmount()
-            );*/
+            stripeService.refundPayment(originalPayment);
 
             originalPayment.setRefundedAmount(originalPayment.getAmount());
             originalPayment.setStatus(PaymentStatus.REFUNDED);

@@ -116,7 +116,7 @@ class EventSpecificationsIntegrationTest {
 
         // Then
         assertEquals(1, results.size());
-        assertEquals("Spring Conference", results.get(0).getName());
+        assertEquals("Spring Conference", results.getFirst().getName());
     }
 
     @Test
@@ -130,7 +130,7 @@ class EventSpecificationsIntegrationTest {
 
         // Then
         assertEquals(1, results.size());
-        assertEquals(EventType.CONFERENCE, results.get(0).getType());
+        assertEquals(EventType.CONFERENCE, results.getFirst().getType());
     }
 
     @Test
@@ -187,7 +187,7 @@ class EventSpecificationsIntegrationTest {
 
         // Then
         assertEquals(1, results.size());
-        Event result = results.get(0);
+        Event result = results.getFirst();
         assertEquals("Paris", result.getAddress().getCity());
         assertEquals(EventStatus.PUBLISHED, result.getStatus());
         assertTrue(result.getIsPublic());
@@ -219,7 +219,7 @@ class EventSpecificationsIntegrationTest {
 
         // Then
         assertEquals(1, results.size());
-        Event result = results.get(0);
+        Event result = results.getFirst();
         assertEquals("Spring Conference", result.getName());
         assertEquals(EventType.CONFERENCE, result.getType());
         assertEquals(EventStatus.PUBLISHED, result.getStatus());

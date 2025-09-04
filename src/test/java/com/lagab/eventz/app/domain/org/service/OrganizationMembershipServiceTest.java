@@ -483,7 +483,7 @@ class OrganizationMembershipServiceTest {
             // Then
             assertNotNull(result);
             assertEquals(1, result.size());
-            assertEquals(testMembershipDto.id(), result.get(0).id());
+            assertEquals(testMembershipDto.id(), result.getFirst().id());
 
             verify(organizationService).isUserMember(userId, organizationId);
             verify(membershipRepository).findMembersByOrganizationId(organizationId);
@@ -628,7 +628,7 @@ class OrganizationMembershipServiceTest {
             // Then
             assertNotNull(result);
             assertEquals(1, result.size());
-            assertEquals(testInvitationResponseDto.email(), result.get(0).email());
+            assertEquals(testInvitationResponseDto.email(), result.getFirst().email());
 
             verify(organizationService).ensureUserIsAdmin(userId, organizationId);
             verify(invitationRepository).findByOrganizationId(organizationId);

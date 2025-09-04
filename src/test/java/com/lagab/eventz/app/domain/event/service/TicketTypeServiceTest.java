@@ -807,19 +807,32 @@ class TicketTypeServiceTest {
         @Test
         @DisplayName("Should throw BusinessException when min quantity greater than max quantity")
         void shouldThrowBusinessExceptionWhenMinQuantityGreaterThanMaxQuantity() {
+            // Given
+            String name = "VIP";
+            String description = "VIP Ticket";
+            BigDecimal price = BigDecimal.valueOf(100);
+            BigDecimal fee = BigDecimal.valueOf(10);
+            int minAttendeesPerOrder = 1;
+            int capacity = 100;
+            int quantityAvailable = 100;
+            LocalDateTime saleStart = LocalDateTime.now().plusDays(1);
+            LocalDateTime saleEnd = LocalDateTime.now().plusDays(29);
+            Integer minQuantity = 10; // minQuantity > maxQuantity
+            Integer maxQuantity = 5;  // maxQuantity
+
             // When & Then
             assertThatThrownBy(() -> new CreateTicketTypeRequest(
-                    "VIP",
-                    "VIP Ticket",
-                    BigDecimal.valueOf(100),
-                    BigDecimal.valueOf(10),
-                    1,
-                    100,
-                    100,
-                    LocalDateTime.now().plusDays(1),
-                    LocalDateTime.now().plusDays(29),
-                    10, // minQuantity > maxQuantity
-                    5,   // maxQuantity
+                    name,
+                    description,
+                    price,
+                    fee,
+                    minAttendeesPerOrder,
+                    capacity,
+                    quantityAvailable,
+                    saleStart,
+                    saleEnd,
+                    minQuantity,
+                    maxQuantity,
                     null // categoryId
             )).isInstanceOf(BusinessException.class)
               .hasMessage("Minimum quantity cannot be greater than maximum quantity");
@@ -828,20 +841,33 @@ class TicketTypeServiceTest {
         @Test
         @DisplayName("Should throw BusinessException when sale start after sale end")
         void shouldThrowBusinessExceptionWhenSaleStartAfterSaleEnd() {
-            // When & Then
+            // Given
+            String name = "VIP";
+            String description = "VIP Ticket";
+            BigDecimal price = BigDecimal.valueOf(100);
+            BigDecimal fee = BigDecimal.valueOf(10);
+            int minAttendeesPerOrder = 1;
+            int capacity = 100;
+            int quantityAvailable = 100;
+            LocalDateTime saleStart = LocalDateTime.now().plusDays(10); // saleStart after saleEnd
+            LocalDateTime saleEnd = LocalDateTime.now().plusDays(5);    // saleEnd
+            Integer minQuantity = 1;
+            Integer maxQuantity = 10;
+
+            // When & Then (single invocation in lambda)
             assertThatThrownBy(() -> new CreateTicketTypeRequest(
-                    "VIP",
-                    "VIP Ticket",
-                    BigDecimal.valueOf(100),
-                    BigDecimal.valueOf(10),
-                    1,
-                    100,
-                    100,
-                    LocalDateTime.now().plusDays(10), // saleStart after saleEnd
-                    LocalDateTime.now().plusDays(5),  // saleEnd
-                    1,
-                    10,   // maxQuantity
-                    null // categoryId
+                    name,
+                    description,
+                    price,
+                    fee,
+                    minAttendeesPerOrder,
+                    capacity,
+                    quantityAvailable,
+                    saleStart,
+                    saleEnd,
+                    minQuantity,
+                    maxQuantity,
+                    null  // categoryId
             )).isInstanceOf(BusinessException.class)
               .hasMessage("Sale start date cannot be after sale end date");
         }
@@ -849,20 +875,32 @@ class TicketTypeServiceTest {
         @Test
         @DisplayName("Should throw BusinessException when quantity available exceeds capacity")
         void shouldThrowBusinessExceptionWhenQuantityAvailableExceedsCapacity() {
+            // Given
+            String name = "VIP";
+            String description = "VIP Ticket";
+            BigDecimal price = BigDecimal.valueOf(100);
+            BigDecimal fee = BigDecimal.valueOf(10);
+            int minAttendeesPerOrder = 1;
+            int capacity = 50;
+            int quantityAvailable = 100;
+            LocalDateTime saleStart = LocalDateTime.now().plusDays(1);
+            LocalDateTime saleEnd = LocalDateTime.now().plusDays(29);
+            Integer minQuantity = 1;
+            Integer maxQuantity = 10;
             // When & Then
             assertThatThrownBy(() -> new CreateTicketTypeRequest(
-                    "VIP",
-                    "VIP Ticket",
-                    BigDecimal.valueOf(100),
-                    BigDecimal.valueOf(10),
-                    1,
-                    50,  // capacity
-                    100, // quantityAvailable > capacity
-                    LocalDateTime.now().plusDays(1),
-                    LocalDateTime.now().plusDays(29),
-                    1,
-                    10,   // maxQuantity
-                    null // categoryId
+                    name,
+                    description,
+                    price,
+                    fee,
+                    minAttendeesPerOrder,
+                    capacity,
+                    quantityAvailable,
+                    saleStart,
+                    saleEnd,
+                    minQuantity,
+                    maxQuantity,
+                    null
             )).isInstanceOf(BusinessException.class)
               .hasMessage("Available quantity cannot exceed capacity");
         }

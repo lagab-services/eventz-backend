@@ -11,11 +11,15 @@ import com.lagab.eventz.app.domain.order.dto.OrderRequest;
 import com.lagab.eventz.app.domain.order.model.Order;
 import com.lagab.eventz.app.domain.order.model.OrderItem;
 import com.lagab.eventz.app.domain.payment.exception.PaymentException;
+import com.lagab.eventz.app.domain.payment.model.Payment;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Coupon;
+import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.CouponCreateParams;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.stripe.param.checkout.SessionRetrieveParams;
 
@@ -43,7 +47,16 @@ public class StripeService {
         log.info("Stripe payment provider initialized");
     }
 
+    public Session createCheckoutSession(Order order, OrderRequest request, String sessionId) {
+        return createCheckoutSessionInternal(order, request, sessionId);
+    }
+
+    // Backward-compatible overload (no sessionId)
     public Session createCheckoutSession(Order order, OrderRequest request) {
+        return createCheckoutSessionInternal(order, request, null);
+    }
+
+    private Session createCheckoutSessionInternal(Order order, OrderRequest request, String sessionId) {
         try {
             log.info("Creating Stripe checkout session for order {}", order.getOrderNumber());
 
@@ -58,7 +71,6 @@ public class StripeService {
                                                                            .setCancelUrl(getCancelUrl(request, order))
                                                                            .addAllLineItem(lineItems)
                                                                            .putMetadata("order_id", order.getId().toString())
-                                                                           .putMetadata("user_id", order.getUser().getId().toString())
                                                                            .putMetadata("order_number", order.getOrderNumber())
                                                                            .setExpiresAt(order.getPaymentDeadline()
                                                                                               .toEpochSecond(java.time.ZoneOffset.UTC));
@@ -85,6 +97,14 @@ public class StripeService {
             String customerEmail = getCustomerEmail(request, order);
             if (StringUtils.hasText(customerEmail)) {
                 paramsBuilder.setCustomerEmail(customerEmail);
+            }
+
+            // Add optional metadata
+            if (order.getUser() != null && order.getUser().getId() != null) {
+                paramsBuilder.putMetadata("user_id", order.getUser().getId().toString());
+            }
+            if (StringUtils.hasText(sessionId)) {
+                paramsBuilder.putMetadata("sessionId", sessionId);
             }
 
             SessionCreateParams params = paramsBuilder.build();
@@ -204,6 +224,24 @@ public class StripeService {
     public boolean isCheckoutSessionComplete(String sessionId) {
         String status = getCheckoutSessionStatus(sessionId);
         return "complete".equals(status);
+    }
+
+    public void refundPayment(Payment payment) {
+        try {
+            PaymentIntent paymentIntent = PaymentIntent.retrieve(payment.getPaymentIntentId());
+            String chargeId = paymentIntent.getLatestCharge();
+            RefundCreateParams params = RefundCreateParams.builder()
+                                                          .setCharge(chargeId)
+                                                          .setAmount(payment.getAmount().toBigInteger().longValue())
+                                                          .build();
+
+            Refund refund = Refund.create(params);
+            log.debug("Refund created : " + refund.getId());
+        } catch (StripeException e) {
+            log.error("Failed to create Stripe refund for order {}", payment.getOrder().getId(), e);
+            throw new PaymentException("Failed to create Stripe refund: " + e.getMessage());
+        }
+
     }
 
     private SessionCreateParams.LineItem createLineItem(OrderItem item) {

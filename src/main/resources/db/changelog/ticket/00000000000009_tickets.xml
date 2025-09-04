@@ -29,6 +29,7 @@
             <column name="event_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <column name="attendee_id" type="BIGINT"/>
         </createTable>
     </changeSet>
 
@@ -46,6 +47,17 @@
                                  constraintName="fk_tickets_event"
                                  referencedTableName="events"
                                  referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="tickets-0004" author="lagab">
+        <addForeignKeyConstraint baseTableName="tickets"
+                                 baseColumnNames="attendee_id"
+                                 constraintName="fk_tickets_attendee"
+                                 referencedTableName="attendees"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="tickets-0005" author="lagab">
+        <addUniqueConstraint tableName="tickets" columnNames="attendee_id" constraintName="uk_tickets_attendee"/>
     </changeSet>
 
     <!-- <changeSet id="tickets-idx-0001" author="lagab">

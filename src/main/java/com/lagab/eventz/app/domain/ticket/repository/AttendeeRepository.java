@@ -20,24 +20,23 @@ public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
 
     List<Attendee> findByOrderId(Long orderId);
 
-    List<Attendee> findByOrderIdAndTicketIsNull(Long orderId);
 
     @Query("SELECT a FROM Attendee a WHERE a.email = :email AND a.event.id = :eventId")
     Optional<Attendee> findByEmailAndEventId(@Param("email") String email, @Param("eventId") Long eventId);
 
-    @Query("SELECT a FROM Attendee a WHERE a.ticket.ticketCode = :ticketNumber")
+    @Query("SELECT a FROM Attendee a JOIN Ticket t ON t.attendee.id = a.id WHERE t.ticketCode = :ticketNumber")
     Optional<Attendee> findByTicketNumber(@Param("ticketNumber") String ticketNumber);
 
     @Query("SELECT a FROM Attendee a WHERE a.event.id = :eventId AND a.checkInStatus = :status")
     Page<Attendee> findByEventIdAndCheckInStatus(@Param("eventId") Long eventId, @Param("status") CheckInStatus status, Pageable pageable);
 
     @Query("""
-            SELECT a FROM Attendee a 
+            SELECT a FROM Attendee a LEFT JOIN Ticket t ON t.attendee.id = a.id
             WHERE (:eventId IS NULL OR a.event.id = :eventId)
             AND (:name IS NULL OR LOWER(CONCAT(a.firstName, ' ', a.lastName)) LIKE LOWER(CONCAT('%', :name, '%')))
             AND (:email IS NULL OR LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%')))
             AND (:status IS NULL OR a.checkInStatus = :status)
-            AND (:ticketTypeId IS NULL OR a.ticket.ticketType.id = :ticketTypeId)
+            AND (:ticketTypeId IS NULL OR t.ticketType.id = :ticketTypeId)
             """)
     List<Attendee> findByCriteria(
             @Param("eventId") Long eventId,

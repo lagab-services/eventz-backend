@@ -25,7 +25,6 @@
             <column name="created_at" type="DATETIME"/>
             <column name="updated_at" type="DATETIME"/>
 
-            <column name="ticket_id" type="BIGINT"/>
             <column name="order_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -34,18 +33,7 @@
             </column>
         </createTable>
     </changeSet>
-
-    <changeSet id="attendees-0002" author="lagab">
-        <addUniqueConstraint tableName="attendees" columnNames="ticket_id" constraintName="uk_attendees_ticket"/>
-    </changeSet>
-
-    <changeSet id="attendees-0003" author="lagab">
-        <addForeignKeyConstraint baseTableName="attendees"
-                                 baseColumnNames="ticket_id"
-                                 constraintName="fk_attendees_ticket"
-                                 referencedTableName="tickets"
-                                 referencedColumnNames="id"/>
-    </changeSet>
+    
 
     <changeSet id="attendees-0004" author="lagab">
         <addForeignKeyConstraint baseTableName="attendees"

@@ -432,12 +432,12 @@ class AuthServiceTest {
             ChangePasswordRequest request = new ChangePasswordRequest(rawCurrentPassword, rawNewPassword);
 
             // Mock authentication
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
+            Authentication authenticationTest = new UsernamePasswordAuthenticationToken(
                     testUser,
                     null,
                     testUser.getAuthorities()
             );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authenticationTest);
 
             when(passwordEncoder.matches(rawCurrentPassword, testUser.getPassword())).thenReturn(true);
             when(passwordEncoder.encode(rawNewPassword)).thenReturn(encodedNewPassword);
@@ -465,18 +465,18 @@ class AuthServiceTest {
         void shouldThrowExceptionForIncorrectCurrentPassword() {
             // Given
             ChangePasswordRequest request = new ChangePasswordRequest("wrong-password", "new-password");
-            User testUser = new User(); // or use your test user setup
-            testUser.setPassword("encoded-current-password");
+            User userTest = new User(); // or use your test user setup
+            userTest.setPassword("encoded-current-password");
 
             // Mock authentication
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    testUser,
+            Authentication authenticationTest = new UsernamePasswordAuthenticationToken(
+                    userTest,
                     null,
-                    testUser.getAuthorities()
+                    userTest.getAuthorities()
             );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authenticationTest);
 
-            when(passwordEncoder.matches(request.currentPassword(), testUser.getPassword())).thenReturn(false);
+            when(passwordEncoder.matches(request.currentPassword(), userTest.getPassword())).thenReturn(false);
 
             // When & Then
             ValidationException exception = assertThrows(ValidationException.class,

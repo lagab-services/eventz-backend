@@ -104,7 +104,7 @@ public class StripeWebhookService {
     }
 
     private void handlePaymentIntentSucceeded(Event event) {
-        log.info("Payment intent succeeded - additional confirmation");
+        log.info("Payment intent succeeded - additional confirmation " + event.getId());
         // Additional processing if needed
     }
 

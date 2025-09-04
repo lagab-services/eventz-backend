@@ -22,6 +22,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
 
     Page<Ticket> findByEventIdAndStatus(Long eventId, TicketStatus status, Pageable pageable);
 
+    Optional<Ticket> findByAttendeeId(Long attendeeId);
+
     @Query("SELECT COUNT(t) FROM Ticket t WHERE t.event.id = :eventId AND t.status = :status")
     long countByEventIdAndStatus(@Param("eventId") Long eventId, @Param("status") TicketStatus status);
 

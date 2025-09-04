@@ -53,8 +53,6 @@ class EventSearchServiceTest {
 
         when(eventRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(new PageImpl<>(List.of(event)));
         when(eventMapper.toSummaryDto(event)).thenReturn(dto);
-        //when(reviewRepository.calculateAverageRating(dto.id())).thenReturn(4.5);
-        //when(reviewRepository.countByEventId(dto.id())).thenReturn(10L);
         when(eventRepository.findById(dto.id())).thenReturn(Optional.of(event));
 
         Page<EventSummaryDTO> result = eventSearchService.searchEvents(searchDTO, pageable);
@@ -91,8 +89,6 @@ class EventSearchServiceTest {
         when(eventRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(event)));
         when(eventMapper.toSummaryDto(event)).thenReturn(dto);
-        //when(reviewRepository.calculateAverageRating(dto.id())).thenReturn(4.2);
-        //when(reviewRepository.countByEventId(dto.id())).thenReturn(8L);
         when(eventRepository.findById(dto.id())).thenReturn(Optional.of(event));
 
         Page<EventSummaryDTO> result = eventSearchService.findEventsWithAvailableTickets(pageable);
@@ -105,8 +101,6 @@ class EventSearchServiceTest {
         Long eventId = 99L;
         EventSummaryDTO dto = getSampleDTO(eventId);
 
-        //when(reviewRepository.calculateAverageRating(eventId)).thenReturn(2.5);
-        //when(reviewRepository.countByEventId(eventId)).thenReturn(3L);
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
         Page<Event> eventPage = new PageImpl<>(List.of(new Event()));
@@ -115,7 +109,7 @@ class EventSearchServiceTest {
 
         Page<EventSummaryDTO> result = eventSearchService.searchEvents(new EventSearchDTO(), PageRequest.of(0, 10));
 
-        EventSummaryDTO enriched = result.getContent().get(0);
+        EventSummaryDTO enriched = result.getContent().getFirst();
         assertThat(enriched.availableTickets()).isZero();
     }
 

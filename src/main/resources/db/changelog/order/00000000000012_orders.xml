@@ -27,9 +27,7 @@
             <column name="discount_amount" type="DECIMAL(10,2)" defaultValueNumeric="0.00"/>
             <column name="promo_code" type="VARCHAR(64)"/>
             <column name="order_notes" type="VARCHAR(1024)"/>
-            <column name="user_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
+            <column name="user_id" type="BIGINT"/>
             <column name="event_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>

@@ -150,7 +150,7 @@ class OrganizationServiceTest {
             // Then
             assertNotNull(result);
             assertEquals(1, result.size());
-            assertEquals(testOrganizationDto.id(), result.get(0).id());
+            assertEquals(testOrganizationDto.id(), result.getFirst().id());
 
             verify(organizationRepository).findByUserId(userId);
             verify(organizationMapper).toDtos(organizations);

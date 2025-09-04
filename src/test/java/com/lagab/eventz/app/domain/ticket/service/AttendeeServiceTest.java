@@ -41,6 +41,7 @@ import com.lagab.eventz.app.domain.ticket.entity.CheckInStatus;
 import com.lagab.eventz.app.domain.ticket.entity.Ticket;
 import com.lagab.eventz.app.domain.ticket.entity.TicketStatus;
 import com.lagab.eventz.app.domain.ticket.repository.AttendeeRepository;
+import com.lagab.eventz.app.domain.ticket.repository.TicketRepository;
 import com.lagab.eventz.app.domain.user.model.User;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -49,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,6 +64,9 @@ class AttendeeServiceTest {
 
     @Mock
     private EventCustomFieldRepository eventCustomFieldRepository;
+
+    @Mock
+    private TicketRepository ticketRepository;
 
     @InjectMocks
     private AttendeeService attendeeService;
@@ -118,7 +123,7 @@ class AttendeeServiceTest {
         testAttendee.setFirstName("John");
         testAttendee.setLastName("Doe");
         testAttendee.setEmail("john@example.com");
-        testAttendee.setTicket(testTicket);
+        testTicket.setAttendee(testAttendee);
         testAttendee.setOrder(testOrder);
         testAttendee.setEvent(testEvent);
         testAttendee.setCheckInStatus(CheckInStatus.NOT_CHECKED_IN);
@@ -147,6 +152,9 @@ class AttendeeServiceTest {
         mutableCustomFields.add(testAttendeeCustomField);
         testAttendee.setCustomFields(mutableCustomFields);
 
+        // Default stub: map attendee -> ticket via repository
+        lenient().when(ticketRepository.findByAttendeeId(org.mockito.ArgumentMatchers.anyLong())).thenReturn(java.util.Optional.of(testTicket));
+
         // Setup test attendee info
         Map<String, String> customFields = new HashMap<>();
         customFields.put("dietary_requirements", "Vegetarian");
@@ -173,7 +181,7 @@ class AttendeeServiceTest {
             when(attendeeRepository.save(any(Attendee.class))).thenReturn(testAttendee);
 
             // When
-            attendeeService.createAttendee(testAttendeeInfo, testOrder, testTicket);
+            attendeeService.createAttendee(testAttendeeInfo, testOrder);
 
             // Then
             ArgumentCaptor<Attendee> attendeeCaptor = ArgumentCaptor.forClass(Attendee.class);
@@ -183,7 +191,6 @@ class AttendeeServiceTest {
             assertEquals("John", capturedAttendee.getFirstName());
             assertEquals("Doe", capturedAttendee.getLastName());
             assertEquals("john@example.com", capturedAttendee.getEmail());
-            assertEquals(testTicket, capturedAttendee.getTicket());
             assertEquals(testOrder, capturedAttendee.getOrder());
             assertEquals(testEvent, capturedAttendee.getEvent());
 
@@ -203,7 +210,7 @@ class AttendeeServiceTest {
             when(attendeeRepository.save(any(Attendee.class))).thenReturn(testAttendee);
 
             // When
-            attendeeService.createAttendee(infoWithoutCustomFields, testOrder, testTicket);
+            attendeeService.createAttendee(infoWithoutCustomFields, testOrder);
 
             // Then
             verify(attendeeRepository).save(any(Attendee.class));
@@ -223,7 +230,7 @@ class AttendeeServiceTest {
 
             // When & Then
             ValidationException exception = assertThrows(ValidationException.class,
-                    () -> attendeeService.createAttendee(infoWithoutRequiredField, testOrder, testTicket));
+                    () -> attendeeService.createAttendee(infoWithoutRequiredField, testOrder));
 
             assertEquals("Required field missing: Dietary Requirements", exception.getMessage());
             verify(attendeeRepository, never()).save(any());
@@ -245,7 +252,7 @@ class AttendeeServiceTest {
 
             // When & Then
             ValidationException exception = assertThrows(ValidationException.class,
-                    () -> attendeeService.createAttendee(infoWithEmptyField, testOrder, testTicket));
+                    () -> attendeeService.createAttendee(infoWithEmptyField, testOrder));
 
             assertEquals("Required field missing: Dietary Requirements", exception.getMessage());
         }
@@ -281,7 +288,7 @@ class AttendeeServiceTest {
             });
 
             // When
-            attendeeService.createAttendee(infoWithMultipleFields, testOrder, testTicket);
+            attendeeService.createAttendee(infoWithMultipleFields, testOrder);
 
             // Then
             ArgumentCaptor<Attendee> attendeeCaptor = ArgumentCaptor.forClass(Attendee.class);
@@ -402,6 +409,26 @@ class AttendeeServiceTest {
             Attendee cancelledAttendee = createAttendee(3L, "Bob", "Johnson", CheckInStatus.CANCELLED, "Standard");
             Attendee notCheckedInAttendee = createAttendee(4L, "Alice", "Brown", CheckInStatus.NOT_CHECKED_IN, "VIP");
 
+            // Prepare tickets per attendee to ensure statistics grouping by ticket type works as expected
+            Ticket vipTicket1 = new Ticket();
+            TicketType vipType = new TicketType();
+            vipType.setName("VIP");
+            vipTicket1.setTicketType(vipType);
+
+            Ticket stdTicket1 = new Ticket();
+            TicketType stdType = new TicketType();
+            stdType.setName("Standard");
+            stdTicket1.setTicketType(stdType);
+
+            Ticket vipTicket2 = new Ticket();
+            vipTicket2.setTicketType(vipType);
+
+            // Override default lenient stub with per-attendee mappings
+            when(ticketRepository.findByAttendeeId(testAttendee.getId())).thenReturn(Optional.of(stdTicket1));
+            when(ticketRepository.findByAttendeeId(checkedInAttendee.getId())).thenReturn(Optional.of(vipTicket1));
+            when(ticketRepository.findByAttendeeId(cancelledAttendee.getId())).thenReturn(Optional.of(stdTicket1));
+            when(ticketRepository.findByAttendeeId(notCheckedInAttendee.getId())).thenReturn(Optional.of(vipTicket2));
+
             List<Attendee> attendees = List.of(testAttendee, checkedInAttendee, cancelledAttendee, notCheckedInAttendee);
 
             when(attendeeRepository.findByEventId(eventId)).thenReturn(attendees);
@@ -477,11 +504,12 @@ class AttendeeServiceTest {
             unassignedAttendee.setId(2L);
             unassignedAttendee.setFirstName("Jane");
             unassignedAttendee.setLastName("Smith");
-            unassignedAttendee.setTicket(null); // Unassigned
 
-            List<Attendee> unassignedAttendees = List.of(unassignedAttendee);
+            List<Attendee> attendees = List.of(unassignedAttendee);
 
-            when(attendeeRepository.findByOrderIdAndTicketIsNull(orderId)).thenReturn(unassignedAttendees);
+            when(attendeeRepository.findByOrderId(orderId)).thenReturn(attendees);
+            // No ticket associated
+            when(ticketRepository.findByAttendeeId(2L)).thenReturn(java.util.Optional.empty());
 
             // When
             List<Attendee> result = attendeeService.findUnassignedAttendees(orderId);
@@ -490,23 +518,9 @@ class AttendeeServiceTest {
             assertNotNull(result);
             assertEquals(1, result.size());
             assertEquals(unassignedAttendee, result.getFirst());
-            verify(attendeeRepository).findByOrderIdAndTicketIsNull(orderId);
+            verify(attendeeRepository).findByOrderId(orderId);
         }
 
-        @Test
-        @DisplayName("Should return empty list when no unassigned attendees")
-        void shouldReturnEmptyListWhenNoUnassignedAttendees() {
-            // Given
-            Long orderId = 1L;
-            when(attendeeRepository.findByOrderIdAndTicketIsNull(orderId)).thenReturn(new ArrayList<>());
-
-            // When
-            List<Attendee> result = attendeeService.findUnassignedAttendees(orderId);
-
-            // Then
-            assertNotNull(result);
-            assertTrue(result.isEmpty());
-        }
     }
 
     @Nested
@@ -809,7 +823,6 @@ class AttendeeServiceTest {
             attendeeWithoutCustomFields.setFirstName("Jane");
             attendeeWithoutCustomFields.setLastName("Smith");
             attendeeWithoutCustomFields.setEmail("jane@example.com");
-            attendeeWithoutCustomFields.setTicket(testTicket);
             attendeeWithoutCustomFields.setCheckInStatus(CheckInStatus.NOT_CHECKED_IN);
             attendeeWithoutCustomFields.setCustomFields(new ArrayList<>());
 
@@ -845,7 +858,7 @@ class AttendeeServiceTest {
             Page<AttendeeResponse> result = attendeeService.getEventAttendees(1L, PageRequest.of(0, 10));
 
             // Then
-            AttendeeResponse response = result.getContent().get(0);
+            AttendeeResponse response = result.getContent().getFirst();
             Map<String, String> customFields = response.customFields();
             assertEquals(3, customFields.size());
             assertEquals("Vegetarian", customFields.get("dietary_requirements"));
@@ -883,7 +896,7 @@ class AttendeeServiceTest {
 
             // When & Then
             ValidationException exception = assertThrows(ValidationException.class,
-                    () -> attendeeService.createAttendee(incompleteInfo, testOrder, testTicket));
+                    () -> attendeeService.createAttendee(incompleteInfo, testOrder));
 
             assertEquals("Required field missing: Company Name", exception.getMessage());
         }
@@ -912,7 +925,7 @@ class AttendeeServiceTest {
             when(attendeeRepository.save(any(Attendee.class))).thenReturn(testAttendee);
 
             // When & Then
-            assertDoesNotThrow(() -> attendeeService.createAttendee(completeInfo, testOrder, testTicket));
+            assertDoesNotThrow(() -> attendeeService.createAttendee(completeInfo, testOrder));
             verify(attendeeRepository).save(any(Attendee.class));
         }
 
@@ -938,7 +951,7 @@ class AttendeeServiceTest {
             when(attendeeRepository.save(any(Attendee.class))).thenReturn(testAttendee);
 
             // When & Then
-            assertDoesNotThrow(() -> attendeeService.createAttendee(infoWithOptional, testOrder, testTicket));
+            assertDoesNotThrow(() -> attendeeService.createAttendee(infoWithOptional, testOrder));
             verify(attendeeRepository).save(any(Attendee.class));
         }
     }
@@ -946,27 +959,6 @@ class AttendeeServiceTest {
     @Nested
     @DisplayName("Edge Cases and Error Handling")
     class EdgeCasesTests {
-
-        @Test
-        @DisplayName("Should handle attendee with null ticket gracefully")
-        void shouldHandleAttendeeWithNullTicketGracefully() {
-            // Given
-            Attendee attendeeWithoutTicket = new Attendee();
-            attendeeWithoutTicket.setId(2L);
-            attendeeWithoutTicket.setFirstName("Jane");
-            attendeeWithoutTicket.setLastName("Smith");
-            attendeeWithoutTicket.setEmail("jane@example.com");
-            attendeeWithoutTicket.setTicket(null);
-            attendeeWithoutTicket.setCheckInStatus(CheckInStatus.NOT_CHECKED_IN);
-            attendeeWithoutTicket.setCustomFields(new ArrayList<>());
-
-            // When & Then - This should throw an exception when trying to map to response
-            assertThrows(NullPointerException.class, () -> {
-                when(attendeeRepository.findByEventId(1L, PageRequest.of(0, 10)))
-                        .thenReturn(new PageImpl<>(List.of(attendeeWithoutTicket)));
-                attendeeService.getEventAttendees(1L, PageRequest.of(0, 10));
-            });
-        }
 
         @Test
         @DisplayName("Should handle repository exceptions gracefully")
@@ -1050,7 +1042,6 @@ class AttendeeServiceTest {
         attendee.setFirstName(firstName);
         attendee.setLastName(lastName);
         attendee.setEmail(firstName.toLowerCase() + "@example.com");
-        attendee.setTicket(ticket);
         attendee.setCheckInStatus(status);
         attendee.setCustomFields(new ArrayList<>());
 
