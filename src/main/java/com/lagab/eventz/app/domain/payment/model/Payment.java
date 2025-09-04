@@ -1,7 +1,9 @@
-package com.lagab.eventz.app.domain.order.model;
+package com.lagab.eventz.app.domain.payment.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.lagab.eventz.app.domain.order.model.Order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

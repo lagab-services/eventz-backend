@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.lagab.eventz.app.domain.event.model.Event;
+import com.lagab.eventz.app.domain.payment.model.Payment;
 import com.lagab.eventz.app.domain.ticket.entity.Ticket;
 import com.lagab.eventz.app.domain.user.model.User;
 

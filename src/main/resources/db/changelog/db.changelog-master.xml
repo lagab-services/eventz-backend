@@ -22,4 +22,8 @@
     <include file="db/changelog/ticket/00000000000010_attendees.xml"/>
     <include file="db/changelog/ticket/00000000000011_attendee_custom_fields.xml"/>
     <include file="db/changelog/promotion/20-08-discounts.xml"/>
+
+    <include file="db/changelog/order/00000000000012_orders.xml"/>
+    <include file="db/changelog/order/00000000000013_order_items.xml"/>
+    <include file="db/changelog/payment/00000000000014_payments.xml"/>
 </databaseChangeLog>
