@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "93460fc3-c456-49c3-9ac6-abd67f4ecde5",
+		"_postman_id": "9d204138-d132-4d81-9a44-43cacb6db4cb",
 		"name": "Tickets API",
 		"description": "Collection to test the organization management system inspired by Better Auth's Organization plugin",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -3455,6 +3455,488 @@
 					]
 				},
 				{
+					"name": "8.3 Custom Field Management",
+					"item": [
+						{
+							"name": "Create new custom field",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status 201 Created\", function() {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Correct response structure\", function() {",
+											"    pm.expect(jsonData).to.have.property('id');",
+											"    pm.expect(jsonData).to.have.property('title');",
+											"    pm.expect(jsonData).to.have.property('createdAt');",
+											"});",
+											"",
+											"if (jsonData && jsonData.id) {",
+											"    pm.collectionVariables.set(\"customFieldId\", jsonData.id);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fieldName\": \"dietary_restrictions\",\n  \"fieldLabel\": \"Restrictions alimentaires\",\n  \"fieldType\": \"SELECT\",\n  \"isRequired\": true,\n  \"fieldOptions\": \"[\\\"Aucune\\\", \\\"Végétarien\\\", \\\"Végétalien\\\", \\\"Sans gluten\\\", \\\"Allergies\\\"]\",\n  \"placeholder\": \"Sélectionnez votre restriction alimentaire\",\n  \"displayOrder\": 3,\n  \"ticketTypeId\": {{ticketTypeId}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/custom-fields/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"custom-fields",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all custom fields for an event",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/custom-fields/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"custom-fields",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all custom fields for ticket type",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/custom-fields/event/{{eventId}}/ticket-type/{{ticketTypeId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"custom-fields",
+										"event",
+										"{{eventId}}",
+										"ticket-type",
+										"{{ticketTypeId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a custom field",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Early Birds VIP\",\n  \"description\": \"tickets a edition limitée\",\n  \"displayOrder\":2,\n  \"isActive\": false,\n  \"isCollapsed\": false\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/custom-fields/event/{{eventId}}/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"custom-fields",
+										"event",
+										"{{eventId}}",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{customFieldId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a custom field",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/custom-field/event/{{eventId}}/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"custom-field",
+										"event",
+										"{{eventId}}",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{customFieldId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "8.4 Discount Management",
+					"item": [
+						{
+							"name": "Create new discount for an event (percentage)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status 201 Created\", function() {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Correct response structure\", function() {",
+											"    pm.expect(jsonData).to.have.property('id');",
+											"    pm.expect(jsonData).to.have.property('title');",
+											"    pm.expect(jsonData).to.have.property('createdAt');",
+											"});",
+											"",
+											"if (jsonData && jsonData.id) {",
+											"    pm.collectionVariables.set(\"discountId\", jsonData.id);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"PERCENTAGE\",\n  \"code\": \"SUMMER25\",\n  \"amount_off\": 15.50,\n  \"percent_off\": 25.0,\n  \"eventId\": {{eventId}},\n  \"quantity_available\": 100,\n  \"start_date\": \"2024-07-01T10:00:00\",\n  \"end_date\": \"2026-07-15T23:59:59\",\n  \"ticket_category_id\": \"{{ticketCategoryId}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/discounts/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"discounts",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create new discount for an event (fixed amount)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status 201 Created\", function() {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Correct response structure\", function() {",
+											"    pm.expect(jsonData).to.have.property('id');",
+											"    pm.expect(jsonData).to.have.property('title');",
+											"    pm.expect(jsonData).to.have.property('createdAt');",
+											"});",
+											"",
+											"if (jsonData && jsonData.id) {",
+											"    pm.collectionVariables.set(\"discountId\", jsonData.id);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"FIXED_AMOUNT\",\n  \"code\": \"EARLYBIRD\",\n  \"amount_off\": 5.00,\n  \"percent_off\": null,\n  \"eventId\": {{eventId}},\n  \"quantity_available\": 200,\n  \"start_date\": \"2024-08-01T08:00:00\",\n  \"end_date\": null,\n  \"end_date_relative\": 7,\n  \"ticket_category_id\": {{ticketCategoryId}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/discounts/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"discounts",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all discounts for an event",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/discounts/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"discounts",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a discount by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/discounts/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"discounts",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{discountId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a discount",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"type\": \"PERCENTAGE\",\n  \"code\": \"SUMMER25\",\n  \"amount_off\": 15.50,\n  \"percent_off\": 15.0,\n  \"quantity_available\": 100,\n  \"start_date\": \"2025-07-01T10:00:00\",\n  \"end_date\": \"2025-09-15T23:59:59\",\n  \"ticket_category_id\": \"{{ticketCategoryId}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/discounts/event/{{eventId}}/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"discounts",
+										"event",
+										"{{eventId}}",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{discountId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a discount",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/discounts/event/{{eventId}}/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"discounts",
+										"event",
+										"{{eventId}}",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{discountId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Search events (GET)",
 					"request": {
 						"method": "GET",
@@ -3902,10 +4384,363 @@
 			]
 		},
 		{
-			"name": "9. Invoice Management",
+			"name": "9. Order Management",
 			"item": [
 				{
-					"name": "List Invoices",
+					"name": "9.1 Cart",
+					"item": [
+						{
+							"name": "Get Cart",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add item to cart",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart/items?ticketTypeId={{ticketTypeId}}&quantity=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart",
+										"items"
+									],
+									"query": [
+										{
+											"key": "ticketTypeId",
+											"value": "{{ticketTypeId}}"
+										},
+										{
+											"key": "quantity",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate and refresh cart",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart/validate",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart",
+										"validate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Apply or remove promo code",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart/promo?code=SUMMER25",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart",
+										"promo"
+									],
+									"query": [
+										{
+											"key": "code",
+											"value": "SUMMER25"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update cart item",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart/items/:id?quantity=2",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart",
+										"items",
+										":id"
+									],
+									"query": [
+										{
+											"key": "quantity",
+											"value": "2"
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove item from cart",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart/items/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart",
+										"items",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clear cart",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/cart",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"cart"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "9.2 Checkout",
+					"item": [
+						{
+							"name": "Create checkout session",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"billingName\": \"Jean Dupont\",\n  \"billingEmail\": \"jean.dupont@email.com\",\n  \"billingPhone\": \"+33 1 23 45 67 89\",\n  \"billingAddress\": \"123 Rue de la Paix\",\n  \"billingCity\": \"Paris\",\n  \"billingZipCode\": \"75001\",\n  \"billingCountry\": \"France\",\n  \"attendees\": [\n    {\n      \"firstName\": \"Jean\",\n      \"lastName\": \"Dupont\",\n      \"email\": \"jean.dupont@email.com\",\n      \"ticketTypeId\": 1,\n      \"customFields\": {\n        \"dietary_restrictions\": \"Végétarien\",\n        \"company\": \"ABC Corp\",\n        \"jobTitle\": \"Développeur\"\n      }\n    },\n    {\n      \"firstName\": \"Marie\",\n      \"lastName\": \"Martin\",\n      \"email\": \"marie.martin@email.com\",\n      \"ticketTypeId\": 1,\n      \"customFields\": {\n        \"dietary_restrictions\": \"Végétarien\",\n        \"specialNeeds\": \"Accès PMR\",\n        \"company\": \"XYZ Ltd\",\n        \"emergencyContact\": \"+33 6 11 22 33 44\"\n      }\n    }\n  ],\n  \"notes\": \"Merci de prévoir une table près de la scène. Commande pour un événement d'entreprise.\",\n  \"acceptTerms\": true,\n  \"subscribeNewsletter\": true,\n  \"successUrl\": \"https://monsite.com/success\",\n  \"cancelUrl\": \"https://monsite.com/cancel\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/orders/checkout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"orders",
+										"checkout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "9.3 Attendee",
+					"item": [
+						{
+							"name": "Get all attendees for an event",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/attendees/event/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"attendees",
+										"event",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get attendees statistics for an event",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/attendees/event/:id/statistics",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"attendees",
+										"event",
+										":id",
+										"statistics"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get event orders",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -3919,18 +4754,51 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/invoices?status=draft",
+							"raw": "{{base_url}}/orders/event/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"invoices"
+								"orders",
+								"event",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{eventId}}"
+								}
+							]
+						},
+						"description": "Lister les factures avec filtres optionnels"
+					},
+					"response": []
+				},
+				{
+					"name": "Get user orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "X-Current-Org",
+								"value": "{{organizationId}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/user/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"user",
+								":id"
 							],
 							"query": [
-								{
-									"key": "status",
-									"value": "draft"
-								},
 								{
 									"key": "customerId",
 									"value": "{{customerId}}",
@@ -3950,6 +4818,12 @@
 									"key": "limit",
 									"value": "1",
 									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
 								}
 							]
 						},
@@ -4410,6 +5284,10 @@
 				}
 			],
 			"description": "Endpoints to manage API keys (create, list, get by id, delete)."
+		},
+		{
+			"name": "Workflow",
+			"item": []
 		}
 	],
 	"auth": {
@@ -4445,53 +5323,43 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080/api",
-			"type": "string"
+			"value": "http://localhost:8080/api"
 		},
 		{
 			"key": "auth_token",
-			"value": "your-bearer-token",
-			"type": "string"
+			"value": "your-bearer-token"
 		},
 		{
 			"key": "organizationId",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "invitationId",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "memberId",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "teamId",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "provider",
-			"value": "google",
-			"type": "string"
+			"value": "google"
 		},
 		{
 			"key": "customerId",
-			"value": "",
-			"type": "default"
+			"value": ""
 		},
 		{
 			"key": "quoteId",
-			"value": "",
-			"type": "default"
+			"value": ""
 		},
 		{
 			"key": "invoiceId",
-			"value": "69d8957f-4e0d-4dc1-a695-68edfa5dcae2",
-			"type": "default"
+			"value": "69d8957f-4e0d-4dc1-a695-68edfa5dcae2"
 		},
 		{
 			"key": "eventId",
@@ -4499,13 +5367,11 @@
 		},
 		{
 			"key": "api_version",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "base_url_version",
-			"value": "{{base_url}}{{api_version}}",
-			"type": "string"
+			"value": "{{base_url}}{{api_version}}"
 		},
 		{
 			"key": "ticketTypeId",
@@ -4513,8 +5379,15 @@
 		},
 		{
 			"key": "ticketCategoryId",
-			"value": "",
-			"type": "default"
+			"value": ""
+		},
+		{
+			"key": "customFieldId",
+			"value": ""
+		},
+		{
+			"key": "discountId",
+			"value": ""
 		}
 	]
 }
