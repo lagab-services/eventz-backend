@@ -20,9 +20,8 @@ public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
 
     List<Attendee> findByOrderId(Long orderId);
 
-
     @Query("SELECT a FROM Attendee a WHERE a.email = :email AND a.event.id = :eventId")
-    Optional<Attendee> findByEmailAndEventId(@Param("email") String email, @Param("eventId") Long eventId);
+    List<Attendee> findByEmailAndEventId(@Param("email") String email, @Param("eventId") Long eventId);
 
     @Query("SELECT a FROM Attendee a JOIN Ticket t ON t.attendee.id = a.id WHERE t.ticketCode = :ticketNumber")
     Optional<Attendee> findByTicketNumber(@Param("ticketNumber") String ticketNumber);

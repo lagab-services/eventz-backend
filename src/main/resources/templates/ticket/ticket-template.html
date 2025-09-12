@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Ticket</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .ticket-container {
+            background: white;
+            width: 560px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+        }
+
+        .ticket-header {
+            background-color: #667eea;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .event-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .event-subtitle {
+            font-size: 16px;
+        }
+
+        .ticket-body {
+            padding: 30px;
+        }
+
+        .ticket-info {
+            width: 100%;
+        }
+
+        .ticket-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ticket-info td {
+            width: 50%;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 20px;
+            border-top: 2px dashed #ddd;
+        }
+
+        .qr-code {
+            margin: 20px 0;
+        }
+
+        .ticket-id {
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .organizer-info {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .venue-address {
+            font-style: italic;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Simulation du flexbox avec des tableaux pour CSS 2.1 */
+        .flex-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .flex-cell {
+            width: 50%;
+            vertical-align: top;
+            padding-right: 15px;
+        }
+
+        .flex-cell:last-child {
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="ticket-container">
+    <!-- En-tête du ticket -->
+    <div class="ticket-header">
+        <div class="event-title" th:text="${ticket.eventName}">Nom de l'événement</div>
+    </div>
+
+    <!-- Corps du ticket -->
+    <div class="ticket-body">
+        <div class="ticket-info">
+            <table class="flex-table">
+                <tr>
+                    <td class="flex-cell">
+                        <div class="info-section">
+                            <span class="info-label">Date et Heure</span>
+                            <span class="info-value">
+                                <span th:text="${ticket.startDate.format(dateFormatter)}">Date</span><br/>
+                                <span th:text="${ticket.startDate.format(timeFormatter)}">Heure</span>
+                            </span>
+                        </div>
+
+                        <div class="info-section">
+                            <span class="info-label">Lieu</span>
+                            <span class="info-value">
+                                <div th:text="${ticket.venueName}">Nom du lieu</div>
+                                <div class="venue-address" th:text="${ticket.venueAddress}">Adresse</div>
+                            </span>
+                        </div>
+
+                        <div class="info-section">
+                            <span class="info-label">Participant</span>
+                            <span class="info-value" th:text="${ticket.buyerName}">Nom du participant</span>
+                        </div>
+                    </td>
+
+                    <td class="flex-cell">
+                        <div class="info-section">
+                            <span class="info-label">Type de ticket</span>
+                            <span class="info-value" th:text="${ticket.ticketType}">Type</span>
+                        </div>
+
+                        <div class="info-section">
+                            <span class="info-label">Prix</span>
+                            <span class="info-value price" th:text="${ticket.price + ' €'}">Prix</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section QR Code -->
+    <div class="qr-section">
+        <span class="info-label">Code de validation</span>
+        <div class="qr-code">
+            <img th:src="${ticket.qrCode}" alt="QR Code" width="150" height="150"/>
+        </div>
+        <div class="ticket-id">
+            Ticket ID: <span th:text="${ticket.ticketId}">ID</span>
+        </div>
+    </div>
+
+    <!-- Informations organisateur -->
+    <div class="organizer-info">
+        <span class="info-label">Organisé par</span>
+        <div th:text="${ticket.organizerName}">Nom de l'organisateur</div>
+    </div>
+</div>
+</body>
+</html>

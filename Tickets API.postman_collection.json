@@ -4432,7 +4432,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/cart/items?ticketTypeId={{ticketTypeId}}&quantity=1",
+									"raw": "{{base_url}}/cart/items?ticketTypeId={{ticketTypeId}}&quantity=2",
 									"host": [
 										"{{base_url}}"
 									],
@@ -4447,7 +4447,7 @@
 										},
 										{
 											"key": "quantity",
-											"value": "1"
+											"value": "2"
 										}
 									]
 								}
@@ -4740,6 +4740,73 @@
 					]
 				},
 				{
+					"name": "9.4 Guest",
+					"item": [
+						{
+							"name": "Track order",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"orderNumber\": \"ORD-1758121346167-70E665B4\",\n    \"email\": \"jean.dupont@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/guest/orders/track",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"guest",
+										"orders",
+										"track"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Ticket",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"orderNumber\": \"ORD-1757691279308-69CAEA87\",\n    \"email\": \"jean.dupont@email.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/guest/orders/{{orderId}}/attendees/{{attendeeId}}/ticket",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"guest",
+										"orders",
+										"{{orderId}}",
+										"attendees",
+										"{{attendeeId}}",
+										"ticket"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Get event orders",
 					"request": {
 						"method": "GET",
@@ -4832,68 +4899,7 @@
 					"response": []
 				},
 				{
-					"name": "Create Invoice",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Status 201 Created\", function() {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"pm.test(\"Correct response structure\", function() {",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData).to.have.property('title');",
-									"    pm.expect(jsonData).to.have.property('createdAt');",
-									"});",
-									"",
-									"if (jsonData && jsonData.id) {",
-									"    pm.collectionVariables.set(\"invoiceId\", jsonData.id);",
-									"}"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"organizationId\": \"{{organizationId}}\",\n  \"customerId\": \"{{customerId}}\",\n  \"issueDate\": \"2023-12-01\",\n  \"dueDate\": \"2023-12-31\",\n  \"status\": \"draft\",\n  \"title\": \"Facture test 2\",\n  \"notes\": \"Facture pour services rendus\",\n  \"totalAmount\": 0,\n  \"items\": [\n    {\n      \"label\": \"Service Consulting\",\n      \"description\": \"Consulting services for project X\",\n      \"quantity\": 5,\n      \"unitPrice\": 120,\n      \"taxRate\": 20\n    },\n    {\n      \"label\": \"Software License\",\n      \"quantity\": 1,\n      \"unitPrice\": 500,\n      \"taxRate\": 10\n    }\n  ]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/invoices",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"invoices"
-							]
-						},
-						"description": "Créer une nouvelle facture avec des articles"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Invoice",
+					"name": "Get order by ID",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -4907,13 +4913,19 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}",
+							"raw": "{{base_url}}/orders/:id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"invoices",
-								"{{invoiceId}}"
+								"orders",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
 							]
 						},
 						"description": "Récupérer une facture spécifique avec tous ses détails"
@@ -4921,7 +4933,7 @@
 					"response": []
 				},
 				{
-					"name": "Update Invoice",
+					"name": "Cancel order",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -4930,218 +4942,34 @@
 								"value": "Bearer {{auth_token}}"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"dueDate\": \"2024-01-15\",\n  \"notes\": \"Facture mise à jour avec nouveau délai\",\n  \"items\": [\n    {\n      \"label\": \"Service Consulting\",\n      \"quantity\": 8,\n      \"unitPrice\": 120,\n      \"taxRate\": 20\n    }\n  ]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"invoices",
-								"{{invoiceId}}"
-							]
-						},
-						"description": "Mettre à jour une facture existante"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Invoice",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
 								"key": "X-Current-Org",
 								"value": "{{organizationId}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}",
+							"raw": "{{base_url}}/orders/:id/cancel?reason=test",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"invoices",
-								"{{invoiceId}}"
-							]
-						},
-						"description": "Supprimer une facture (uniquement si statut 'draft')"
-					},
-					"response": []
-				},
-				{
-					"name": "Send Invoice",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}/send",
-							"host": [
-								"{{base_url}}"
+								"orders",
+								":id",
+								"cancel"
 							],
-							"path": [
-								"invoices",
-								"{{invoiceId}}",
-								"send"
-							]
-						},
-						"description": "Envoyer une facture (change le statut de 'draft' à 'open')"
-					},
-					"response": []
-				},
-				{
-					"name": "Mark Invoice as Paid",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"paymentDate\": \"2023-12-15\",\n  \"paymentMethod\": \"bank_transfer\",\n  \"reference\": \"TRANSACTION-12345\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}/mark-paid",
-							"host": [
-								"{{base_url}}"
+							"query": [
+								{
+									"key": "reason",
+									"value": "test"
+								}
 							],
-							"path": [
-								"invoices",
-								"{{invoiceId}}",
-								"mark-paid"
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
 							]
 						},
-						"description": "Marquer une facture comme payée"
-					},
-					"response": []
-				},
-				{
-					"name": "Update Invoice Status",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"status\": \"cancelled\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}/status",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"invoices",
-								"{{invoiceId}}",
-								"status"
-							]
-						},
-						"description": "Changer le statut d'une facture"
-					},
-					"response": []
-				},
-				{
-					"name": "Recalculate Invoice",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}/recalculate",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"invoices",
-								"{{invoiceId}}",
-								"recalculate"
-							]
-						},
-						"description": "Recalculer le montant total d'une facture"
-					},
-					"response": []
-				},
-				{
-					"name": "Download Invoice PDF",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							},
-							{
-								"key": "X-Current-Org",
-								"value": "{{organizationId}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/invoices/{{invoiceId}}/download",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"invoices",
-								"{{invoiceId}}",
-								"download"
-							]
-						},
-						"description": "Télécharger le PDF d'une facture"
+						"description": "Récupérer une facture spécifique avec tous ses détails"
 					},
 					"response": []
 				}
@@ -5388,6 +5216,16 @@
 		{
 			"key": "discountId",
 			"value": ""
+		},
+		{
+			"key": "attendeeId",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

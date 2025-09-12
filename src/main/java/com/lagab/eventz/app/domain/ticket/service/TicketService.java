@@ -77,7 +77,7 @@ public class TicketService {
     }
 
     private String generateTicketCode() {
-        return "TKT-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
+        return "T" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
     }
 
     private String generateQRCode() {

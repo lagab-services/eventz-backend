@@ -21,11 +21,13 @@ import com.lagab.eventz.app.domain.ticket.dto.AttendeeInfo;
 import com.lagab.eventz.app.domain.ticket.dto.AttendeeResponse;
 import com.lagab.eventz.app.domain.ticket.dto.AttendeeSearchCriteria;
 import com.lagab.eventz.app.domain.ticket.dto.AttendeeStatistics;
+import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
 import com.lagab.eventz.app.domain.ticket.dto.TransferTicketRequest;
 import com.lagab.eventz.app.domain.ticket.entity.Attendee;
 import com.lagab.eventz.app.domain.ticket.entity.AttendeeCustomField;
 import com.lagab.eventz.app.domain.ticket.entity.CheckInStatus;
 import com.lagab.eventz.app.domain.ticket.entity.Ticket;
+import com.lagab.eventz.app.domain.ticket.mapper.TicketMapper;
 import com.lagab.eventz.app.domain.ticket.repository.AttendeeRepository;
 import com.lagab.eventz.app.domain.ticket.repository.TicketRepository;
 
@@ -37,6 +39,9 @@ public class AttendeeService {
     private final AttendeeRepository attendeeRepository;
     private final EventCustomFieldRepository eventCustomFieldRepository;
     private final TicketRepository ticketRepository;
+    private final PdfService pdfService;
+    private final TicketMapper ticketMapper;
+    private final QrCodeService qrCodeService;
 
     public void createAttendee(AttendeeInfo request, Order order) {
         // Validate custom fields
@@ -176,14 +181,21 @@ public class AttendeeService {
                                  .toList();
     }
 
-    /*
-    Todo: generate pdf
     public byte[] generateTicketPdf(Long attendeeId) {
-        Attendee attendee = attendeeRepository.findById(attendeeId)
-                                              .orElseThrow(() -> new EntityNotFoundException("Attendee not found"));
+        Ticket ticket = ticketRepository.findByAttendeeId(attendeeId)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Ticket not found for attendee"));
+        TicketDTO dto = ticketMapper.toDto(ticket);
+        String qrCodeBase64 = generateQrCode(ticket);
+        dto.setQrCode(qrCodeBase64);
+        return pdfService.generateTicket(dto);
+    }
 
-        return pdfService.generateTicket(attendee);
-    }*/
+    private String generateQrCode(Ticket ticket) {
+        String qrCodeData = String.format("%s-%s",
+                ticket.getTicketCode().substring(1),
+                ticket.getAttendee().getId());
+        return qrCodeService.generateQrCodeBase64(qrCodeData, 200, 200);
+    }
 
     private boolean isTransferAllowed(Attendee attendee) {
         Event event = attendee.getEvent();

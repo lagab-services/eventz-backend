@@ -178,8 +178,8 @@ class TicketServiceTest {
             // Verify ticket properties
             for (Ticket ticket : capturedTickets) {
                 assertNotNull(ticket.getTicketCode());
-                assertTrue(ticket.getTicketCode().startsWith("TKT-"));
-                assertEquals(12, ticket.getTicketCode().length() - 4); // TKT- prefix + 12 chars
+                assertTrue(ticket.getTicketCode().startsWith("T"));
+                assertEquals(12, ticket.getTicketCode().length() - 1); // T prefix + 12 chars
                 assertNotNull(ticket.getQrCode());
                 assertEquals(TicketStatus.VALID, ticket.getStatus());
                 assertFalse(ticket.getCheckedIn());
@@ -432,8 +432,8 @@ class TicketServiceTest {
 
             // Verify format
             for (String code : ticketCodes) {
-                assertTrue(code.startsWith("TKT-"));
-                assertEquals(16, code.length()); // TKT- (4) + 12 chars
+                assertTrue(code.startsWith("T"));
+                assertEquals(13, code.length()); // T (1) + 12 chars
                 assertTrue(code.substring(4).matches("[A-Z0-9]+"));
             }
         }
