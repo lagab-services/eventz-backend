@@ -3,6 +3,7 @@ package com.lagab.eventz.app.domain.order.repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,4 +60,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     @Query("SELECT o FROM Order o JOIN o.orderItems i WHERE i.ticketType.event.id = :eventId AND o.status = :status")
     Page<Order> findByEventIdAndStatus(@Param("eventId") Long eventId, @Param("status") OrderStatus status, Pageable pageable);
+
+    Optional<Order> findByOrderNumberAndBillingEmailIgnoreCase(String orderNumber, String billingEmail);
 }
