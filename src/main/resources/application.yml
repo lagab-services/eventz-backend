@@ -82,6 +82,12 @@ common:
     termsOfServiceUrl: ~
     title: "Backend API"
     version: #project.version#
+## stripe config
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY:sk_test_your_key_here}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_your_webhook_secret}
+  success-url: ${app.frontend.url}/order/success
+  cancel-url: ${app.frontend.url}/order/cancel
 
 app:
   auth:
@@ -97,3 +103,4 @@ app:
     url: ${FRONTEND_URL:http://localhost:3000}
   logo:
     url: ${APP_LOGO_URL:http://localhost:8080/assets/logo.png}
+  base-url: ${APP_BASE_URL:http://localhost:8080}

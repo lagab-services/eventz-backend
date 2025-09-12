@@ -16,8 +16,8 @@ import com.lagab.eventz.app.domain.event.dto.ticket.CreateTicketTypeRequest;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeStatsDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.UpdateTicketTypeRequest;
+import com.lagab.eventz.app.domain.event.model.TicketType;
 import com.lagab.eventz.app.domain.event.projection.TicketTypeStatsProjection;
-import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 
 @Mapper(
         componentModel = "spring",
@@ -26,10 +26,14 @@ import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 )
 public interface TicketTypeMapper {
 
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "quantityRemaining", source = ".", qualifiedByName = "calculateQuantityRemaining")
     @Mapping(target = "totalPrice", source = ".", qualifiedByName = "calculateTotalPrice")
     @Mapping(target = "isOnSale", source = ".", qualifiedByName = "calculateIsOnSale")
     @Mapping(target = "isSoldOut", source = ".", qualifiedByName = "calculateIsSoldOut")
+    @Mapping(target = "eventId", source = "event.id")
+    @Mapping(target = "eventName", source = "event.name")
     TicketTypeDTO toDTO(TicketType ticketType);
 
     List<TicketTypeDTO> toDTOList(List<TicketType> ticketTypes);
@@ -37,14 +41,14 @@ public interface TicketTypeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "quantitySold", constant = "0")
     @Mapping(target = "event", ignore = true)
-        //@Mapping(target = "orderItems", ignore = true)
+    @Mapping(target = "category", ignore = true)
     TicketType toEntity(CreateTicketTypeRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "quantitySold", ignore = true)
     @Mapping(target = "event", ignore = true)
-        //@Mapping(target = "orderItems", ignore = true)
+    @Mapping(target = "category", ignore = true)
     void updateEntityFromDTO(UpdateTicketTypeRequest request, @MappingTarget TicketType ticketType);
 
     // Méthodes par défaut pour les calculs
@@ -68,7 +72,7 @@ public interface TicketTypeMapper {
     }
 
     @Named("calculateIsOnSale")
-    default Boolean calculateIsOnSale(TicketType ticketType) {
+    default boolean calculateIsOnSale(TicketType ticketType) {
         if (ticketType == null || !Boolean.TRUE.equals(ticketType.getIsActive())) {
             return false;
         }
@@ -79,7 +83,7 @@ public interface TicketTypeMapper {
     }
 
     @Named("calculateIsSoldOut")
-    default Boolean calculateIsSoldOut(TicketType ticketType) {
+    default boolean calculateIsSoldOut(TicketType ticketType) {
         if (ticketType == null || ticketType.getQuantityAvailable() == null) {
             return false;
         }
