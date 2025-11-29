@@ -13,6 +13,11 @@
 spring:
   application:
     name: backend
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${DATABASE_URL:your_database_url}
+    username: ${DATABASE_USER:your_database_user}
+    password: ${DATABASE_PASSWORD:your_database_passwoard}
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
@@ -54,7 +59,11 @@ spring:
   web:
     resources:
       add-mappings: false
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 springdoc:
   swagger-ui:
     enabled: false
