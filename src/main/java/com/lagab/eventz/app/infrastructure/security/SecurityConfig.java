@@ -63,6 +63,8 @@ public class SecurityConfig {
                                     "/api/auth/resend-verification",
                                     "/api/guest/orders/**",
                                     "/h2-console/**",
+                                    "/api/v1/events/**",
+                                    "/api/v1/cart/**",
                                     "/actuator/health",
                                     "/webhook/stripe"
                             ).permitAll()
