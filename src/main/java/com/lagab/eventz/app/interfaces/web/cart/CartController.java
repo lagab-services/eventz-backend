@@ -215,7 +215,7 @@ public class CartController {
     }
 
     private String getSessionId(HttpServletRequest request) {
-        return request.getSession().getId();
+        return request.getHeader("X-Session-Token");
     }
 
     private CartResponse mapToCartResponse(Cart cart) {

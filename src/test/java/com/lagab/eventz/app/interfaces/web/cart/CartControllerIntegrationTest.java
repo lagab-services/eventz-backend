@@ -165,7 +165,7 @@ class CartControllerIntegrationTest {
         void should_return_current_cart() throws Exception {
             when(cartService.getCart(anyString(), any())).thenReturn(testCart);
 
-            mockMvc.perform(get("/api/cart").session(session))
+            mockMvc.perform(get("/api/cart").header("X-Session-Token", "test-session-123"))
                    .andDo(print())
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.items", hasSize(1)))
@@ -187,7 +187,7 @@ class CartControllerIntegrationTest {
                            .param("ticketTypeId", "0")
                            .param("quantity", "2")
                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isBadRequest());
 
@@ -201,7 +201,7 @@ class CartControllerIntegrationTest {
                            .param("ticketTypeId", "1")
                            .param("quantity", "0")
                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isBadRequest());
 
@@ -217,7 +217,7 @@ class CartControllerIntegrationTest {
                            .param("ticketTypeId", "1")
                            .param("quantity", "2")
                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andDo(print())
                    .andExpect(status().isOk())
@@ -248,7 +248,7 @@ class CartControllerIntegrationTest {
                            .param("ticketTypeId", "1")
                            .param("quantity", "2")
                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isBadRequest())
                    .andExpect(jsonPath("$.errors", hasSize(1)))
@@ -264,7 +264,7 @@ class CartControllerIntegrationTest {
         void should_validate_quantity_non_negative() throws Exception {
             mockMvc.perform(put("/api/cart/items/{ticketTypeId}", 1)
                            .param("quantity", "-1")
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isBadRequest());
 
@@ -278,7 +278,7 @@ class CartControllerIntegrationTest {
 
             mockMvc.perform(put("/api/cart/items/{ticketTypeId}", 1)
                            .param("quantity", "3")
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.items", hasSize(1)))
@@ -296,7 +296,7 @@ class CartControllerIntegrationTest {
             when(cartService.removeFromCart(anyString(), any(), eq(1L))).thenReturn(testCart);
 
             mockMvc.perform(delete("/api/cart/items/{ticketTypeId}", 1)
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.items", hasSize(1)))
@@ -313,7 +313,7 @@ class CartControllerIntegrationTest {
             doNothing().when(cartService).clearCart(anyString(), any());
 
             mockMvc.perform(delete("/api/cart")
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isNoContent());
         }
@@ -331,7 +331,7 @@ class CartControllerIntegrationTest {
             when(cartService.validateAndRefreshCart(anyString(), any())).thenReturn(result);
 
             mockMvc.perform(post("/api/cart/validate")
-                           .session(session)
+                           .header("X-Session-Token", "test-session-123")
                            .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.warnings", hasSize(1)))
@@ -350,7 +350,7 @@ class CartControllerIntegrationTest {
             when(cartService.applyPromoCode(anyString(), any(), eq("PROMO10"))).thenReturn(testCart);
 
             mockMvc.perform(post("/api/cart/promo").param("code", "PROMO10")
-                                                   .session(session)
+                                                   .header("X-Session-Token", "test-session-123")
                                                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.items", hasSize(1)))
@@ -370,7 +370,7 @@ class CartControllerIntegrationTest {
             when(cartMapper.createErrorResponse(any(CartMessage.class))).thenReturn(errorResponse);
 
             mockMvc.perform(post("/api/cart/promo").param("code", "BAD")
-                                                   .session(session)
+                                                   .header("X-Session-Token", "test-session-123")
                                                    .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf()))
                    .andExpect(status().isBadRequest())
                    .andExpect(jsonPath("$.errors", hasSize(1)))

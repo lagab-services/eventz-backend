@@ -65,6 +65,7 @@ public class SecurityConfig {
                                     "/h2-console/**",
                                     "/api/v1/events/**",
                                     "/api/v1/cart/**",
+                                    "/api/cart/**",
                                     "/actuator/health",
                                     "/webhook/stripe"
                             ).permitAll()
