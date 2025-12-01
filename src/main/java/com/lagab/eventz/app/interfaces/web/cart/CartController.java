@@ -242,6 +242,7 @@ public class CartController {
         return new CartResponse.CartItemResponse(
                 item.getTicketTypeId(),
                 item.getTicketTypeName(),
+                item.getEventId(),
                 item.getEventTitle(),
                 item.getUnitPrice(),
                 item.getQuantity(),

@@ -29,6 +29,7 @@ public record CartResponse(
     public record CartItemResponse(
             Long ticketTypeId,
             String ticketTypeName,
+            Long eventId,
             String eventTitle,
             BigDecimal unitPrice,
             Integer quantity,

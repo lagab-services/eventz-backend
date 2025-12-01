@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lagab.eventz.app.common.exception.UnauthorizedException;
 import com.lagab.eventz.app.domain.order.dto.CheckoutResponse;
 import com.lagab.eventz.app.domain.order.dto.OrderRequest;
 import com.lagab.eventz.app.domain.order.dto.OrderResponse;
@@ -44,21 +45,35 @@ public class OrderController {
             HttpServletRequest request,
             @Valid @RequestBody OrderRequest orderRequest) {
 
-        Long userId = SecurityUtils.getCurrentUserId();
+        Long userId = null;
+        try {
+            userId = SecurityUtils.getCurrentUserId();
+        } catch (UnauthorizedException e) {
+            log.warn("User not authenticated, proceeding without userId");
+        }
 
         log.info("Creating checkout session for user {} ", userId);
 
-        String sessionId = request.getSession().getId();
+        String sessionId = getSessionId(request);
         Session stripeSession = orderService.createCheckoutSession(sessionId, userId, orderRequest);
+
+        String orderId = null;
+        if (stripeSession.getMetadata() != null) {
+            orderId = stripeSession.getMetadata().get("order_id");
+        }
 
         CheckoutResponse response = CheckoutResponse.builder()
                                                     .checkoutUrl(stripeSession.getUrl())
                                                     .sessionId(stripeSession.getId())
-                                                    .orderId(stripeSession.getMetadata().get("order_id"))
+                                                    .orderId(orderId)
                                                     .expiresAt(stripeSession.getExpiresAt())
                                                     .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    private String getSessionId(HttpServletRequest request) {
+        return request.getHeader("X-Session-Token");
     }
 
     /*@PostMapping

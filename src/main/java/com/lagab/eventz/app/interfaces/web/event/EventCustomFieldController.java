@@ -44,7 +44,6 @@ public class EventCustomFieldController {
 
     @GetMapping("/event/{eventId}")
     @Operation(summary = "List custom fields for an event (ordered by display order)")
-    @RequireOrganizationPermission(permission = "EVENT_EDIT")
     public ResponseEntity<List<EventCustomFieldDTO>> getEventCustomFields(
             @Parameter(description = "Event ID") @PathVariable Long eventId) {
         var fields = customFieldService.getEventCustomFields(eventId);

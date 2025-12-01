@@ -96,6 +96,7 @@ class CartControllerIntegrationTest {
         testCartItem.setTicketTypeId(1L);
         testCartItem.setTicketTypeName("VIP Ticket");
         testCartItem.setEventTitle("Test Event");
+        testCartItem.setEventId(1L);
         testCartItem.setUnitPrice(new BigDecimal("100.00"));
         testCartItem.setQuantity(2);
         testCartItem.setTotalPrice(new BigDecimal("200.00"));
@@ -114,7 +115,7 @@ class CartControllerIntegrationTest {
 
         // Create test response
         CartResponse.CartItemResponse itemResponse = new CartResponse.CartItemResponse(
-                1L, "VIP Ticket", "Test Event", new BigDecimal("100.00"),
+                1L, "VIP Ticket", 1L, "Test Event", new BigDecimal("100.00"),
                 2, new BigDecimal("200.00"), 10, true
         );
 
