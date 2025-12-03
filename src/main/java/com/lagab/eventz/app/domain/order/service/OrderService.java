@@ -72,7 +72,7 @@ public class OrderService {
     public Session createCheckoutSession(String sessionId, Long userId, OrderRequest request) {
 
         Order order = createOrderFromCart(sessionId, userId, request);
-        order.setPaymentDeadline(LocalDateTime.now().plusMinutes(15));
+        order.setPaymentDeadline(LocalDateTime.now().plusMinutes(30));
 
         // Create stripe Checkout session
         return stripeService.createCheckoutSession(order, request, sessionId);
@@ -94,10 +94,12 @@ public class OrderService {
             throw new OrderException("The cart is empty");
         }
         User loggedUser = null;
-        try {
-            loggedUser = getUserById(userId);
-        } catch (Exception e) {
-            log.debug(e.getMessage());
+        if (userId != null) {
+            try {
+                loggedUser = getUserById(userId);
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
         }
 
         // Create the order
