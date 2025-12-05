@@ -4,13 +4,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import com.lagab.eventz.app.domain.event.model.Event;
 import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
 import com.lagab.eventz.app.domain.ticket.entity.Ticket;
+import com.lagab.eventz.app.util.UrlUtil;
 
 @Mapper(componentModel = "spring")
 public interface TicketMapper {
 
     @Mapping(target = "eventName", source = "event.name")
+    @Mapping(target = "eventUrl", source = "event", qualifiedByName = "toEventUrl")
     @Mapping(target = "surtitle", source = "event.surtitle")
     @Mapping(target = "subtitle", source = "event.subtitle")
     @Mapping(target = "startDate", source = "event.startDate")
@@ -20,6 +23,7 @@ public interface TicketMapper {
     @Mapping(target = "venueCity", source = "event.address.city")
     @Mapping(target = "venueCountry", source = "event.address.country")
     @Mapping(target = "buyerName", source = "order.billingName")
+    @Mapping(target = "buyerEmail", source = "order.billingEmail")
     @Mapping(target = "ticketType", source = "ticketType.name")
     @Mapping(target = "ticketNumber", source = "ticketCode")
     @Mapping(target = "qrCode", source = "qrCode")
@@ -42,5 +46,10 @@ public interface TicketMapper {
     @Named("priceToDouble")
     default double priceToDouble(java.math.BigDecimal price) {
         return price == null ? 0.0 : price.doubleValue();
+    }
+
+    @Named("toEventUrl")
+    default String toEventUrl(Event event) {
+        return UrlUtil.slugify(event.getName()) + "_E" + event.getId();
     }
 }

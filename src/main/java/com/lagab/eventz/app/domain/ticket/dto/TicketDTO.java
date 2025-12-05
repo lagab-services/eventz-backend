@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TicketDTO {
     private String eventName;
+    private String eventUrl;
     private String surtitle;
     private String subtitle;
     private LocalDateTime startDate;
@@ -24,6 +25,7 @@ public class TicketDTO {
     private String venueCity;
     private String venueCountry;
     private String buyerName;
+    private String buyerEmail;
     private String ticketType;
     private String ticketNumber;
     private String qrCode;

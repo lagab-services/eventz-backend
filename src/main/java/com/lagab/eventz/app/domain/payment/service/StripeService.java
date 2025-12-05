@@ -68,9 +68,9 @@ public class StripeService {
                                                                            .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                                                                            .setMode(SessionCreateParams.Mode.PAYMENT)
                                                                            .setSuccessUrl(getSuccessUrl(request))
-                                                                           .setCancelUrl(getCancelUrl(request, order))
+                                                                           .setCancelUrl(getCancelUrl(request))
                                                                            .addAllLineItem(lineItems)
-                                                                           .putMetadata("order_id", order.getId().toString())
+                                                                           .putMetadata("order_id", order.getOrderNumber())
                                                                            .putMetadata("order_number", order.getOrderNumber())
                                                                            .setExpiresAt(order.getPaymentDeadline()
                                                                                               .toEpochSecond(java.time.ZoneOffset.UTC));
@@ -294,11 +294,11 @@ public class StripeService {
         return successUrl + "?session_id={CHECKOUT_SESSION_ID}";
     }
 
-    private String getCancelUrl(OrderRequest request, Order order) {
+    private String getCancelUrl(OrderRequest request) {
         if (StringUtils.hasText(request.cancelUrl())) {
             return request.cancelUrl();
         }
-        return cancelUrl + "?order_id=" + order.getId();
+        return cancelUrl + "?session_id={CHECKOUT_SESSION_ID}";
     }
 
     private String getCustomerEmail(OrderRequest request, Order order) {

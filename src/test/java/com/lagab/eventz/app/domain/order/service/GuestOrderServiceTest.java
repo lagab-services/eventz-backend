@@ -58,7 +58,8 @@ class GuestOrderServiceTest {
                 .thenReturn(Optional.of(order));
 
         OrderResponse mapped = new OrderResponse(1L, "ORD-321", OrderStatus.PAID, BigDecimal.TEN, BigDecimal.ZERO,
-                LocalDateTime.now(), java.util.List.of(), "Evt", LocalDateTime.now(), "Loc", LocalDateTime.now(), null);
+                LocalDateTime.now(), java.util.List.of(), "Evt", "evt_E1", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "Loc", "Addr",
+                LocalDateTime.now(), null);
         when(orderMapper.toResponse(any(Order.class))).thenReturn(mapped);
 
         OrderResponse resp = service.trackOrder(new TrackOrderRequest("ORD-321", "guest@example.com"));

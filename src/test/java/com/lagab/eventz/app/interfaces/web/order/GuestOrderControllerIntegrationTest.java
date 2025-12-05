@@ -63,8 +63,11 @@ class GuestOrderControllerIntegrationTest {
                 LocalDateTime.now(),
                 List.of(),
                 "My Event",
+                "my-event_E1",
+                LocalDateTime.now(),
                 LocalDateTime.now().plusDays(1),
                 "Paris",
+                "France",
                 LocalDateTime.now().plusMinutes(5),
                 null
         );

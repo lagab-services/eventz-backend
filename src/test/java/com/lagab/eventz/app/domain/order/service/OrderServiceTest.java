@@ -875,8 +875,11 @@ class OrderServiceTest {
                 LocalDateTime.now(),
                 items,
                 "Test Event",
+                "test-event_E1",
+                LocalDateTime.now(),
                 LocalDateTime.now().plusDays(30),
                 "Test Location",
+                "Test Address",
                 LocalDateTime.now().plusMinutes(15),
                 ""
         );

@@ -8,9 +8,13 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
+import com.lagab.eventz.app.domain.event.model.Address;
+import com.lagab.eventz.app.domain.event.model.Event;
+import com.lagab.eventz.app.domain.event.util.AddressUtil;
 import com.lagab.eventz.app.domain.order.dto.OrderResponse;
 import com.lagab.eventz.app.domain.order.model.Order;
 import com.lagab.eventz.app.domain.order.model.OrderItem;
+import com.lagab.eventz.app.util.UrlUtil;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
@@ -18,8 +22,11 @@ public interface OrderMapper {
     @Mapping(target = "orderId", source = "id")
     @Mapping(target = "items", source = "orderItems")
     @Mapping(target = "eventTitle", source = "event.name")
-    @Mapping(target = "eventDate", source = "event.startDate")
-    @Mapping(target = "eventLocation", source = "event.address.address1")
+    @Mapping(target = "eventUrl", source = "event", qualifiedByName = "toEventUrl")
+    @Mapping(target = "eventStartDate", source = "event.startDate")
+    @Mapping(target = "eventEndDate", source = "event.endDate")
+    @Mapping(target = "eventLocation", source = "event.address.name")
+    @Mapping(target = "eventAddress", source = "event.address", qualifiedByName = "formatAddress")
     @Mapping(target = "expiresAt", source = ".", qualifiedByName = "computeExpiresAt")
     OrderResponse toResponse(Order order);
 
@@ -47,5 +54,15 @@ public interface OrderMapper {
             return order.getCreatedAt().plusMinutes(5);
         }
         return LocalDateTime.now().plusMinutes(5);
+    }
+
+    @Named("toEventUrl")
+    default String toEventUrl(Event event) {
+        return UrlUtil.slugify(event.getName()) + "_E" + event.getId();
+    }
+
+    @Named("formatAddress")
+    default String formatAddress(Address address) {
+        return AddressUtil.formatAddress(address);
     }
 }

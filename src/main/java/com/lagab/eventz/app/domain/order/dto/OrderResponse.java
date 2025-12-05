@@ -22,8 +22,11 @@ public record OrderResponse(
 
         // Event information
         String eventTitle,
-        LocalDateTime eventDate,
+        String eventUrl,
+        LocalDateTime eventStartDate,
+        LocalDateTime eventEndDate,
         String eventLocation,
+        String eventAddress,
 
         // Next steps
         LocalDateTime expiresAt, // Reservation expiration
