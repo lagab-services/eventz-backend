@@ -2,6 +2,7 @@ package com.lagab.eventz.app.interfaces.web.order;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +70,8 @@ class GuestOrderControllerIntegrationTest {
                 "Paris",
                 "France",
                 LocalDateTime.now().plusMinutes(5),
-                null
+                null,
+                new ArrayList<>()
         );
         when(guestOrderService.trackOrder(any(TrackOrderRequest.class))).thenReturn(response);
 

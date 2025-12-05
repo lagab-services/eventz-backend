@@ -13,7 +13,7 @@ import com.lagab.eventz.app.util.UrlUtil;
 public interface TicketMapper {
 
     @Mapping(target = "eventName", source = "event.name")
-    @Mapping(target = "eventUrl", source = "event", qualifiedByName = "toEventUrl")
+    @Mapping(target = "eventUrl", source = "event", qualifiedByName = "toTicketEventUrl")
     @Mapping(target = "surtitle", source = "event.surtitle")
     @Mapping(target = "subtitle", source = "event.subtitle")
     @Mapping(target = "startDate", source = "event.startDate")
@@ -48,7 +48,7 @@ public interface TicketMapper {
         return price == null ? 0.0 : price.doubleValue();
     }
 
-    @Named("toEventUrl")
+    @Named("toTicketEventUrl")
     default String toEventUrl(Event event) {
         return UrlUtil.slugify(event.getName()) + "_E" + event.getId();
     }

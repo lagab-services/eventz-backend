@@ -2,6 +2,7 @@ package com.lagab.eventz.app.domain.order.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -53,13 +54,14 @@ class GuestOrderServiceTest {
         order.setStatus(OrderStatus.PAID);
         order.setTotalAmount(BigDecimal.TEN);
         order.setCreatedAt(LocalDateTime.now());
+        order.setTickets(new ArrayList<>());
 
         when(orderRepository.findByOrderNumberAndBillingEmailIgnoreCase("ORD-321", "guest@example.com"))
                 .thenReturn(Optional.of(order));
 
         OrderResponse mapped = new OrderResponse(1L, "ORD-321", OrderStatus.PAID, BigDecimal.TEN, BigDecimal.ZERO,
                 LocalDateTime.now(), java.util.List.of(), "Evt", "evt_E1", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "Loc", "Addr",
-                LocalDateTime.now(), null);
+                LocalDateTime.now(), null, new ArrayList<>());
         when(orderMapper.toResponse(any(Order.class))).thenReturn(mapped);
 
         OrderResponse resp = service.trackOrder(new TrackOrderRequest("ORD-321", "guest@example.com"));

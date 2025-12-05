@@ -14,9 +14,10 @@ import com.lagab.eventz.app.domain.event.util.AddressUtil;
 import com.lagab.eventz.app.domain.order.dto.OrderResponse;
 import com.lagab.eventz.app.domain.order.model.Order;
 import com.lagab.eventz.app.domain.order.model.OrderItem;
+import com.lagab.eventz.app.domain.ticket.mapper.TicketMapper;
 import com.lagab.eventz.app.util.UrlUtil;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { TicketMapper.class })
 public interface OrderMapper {
 
     @Mapping(target = "orderId", source = "id")
@@ -28,6 +29,7 @@ public interface OrderMapper {
     @Mapping(target = "eventLocation", source = "event.address.name")
     @Mapping(target = "eventAddress", source = "event.address", qualifiedByName = "formatAddress")
     @Mapping(target = "expiresAt", source = ".", qualifiedByName = "computeExpiresAt")
+    @Mapping(target = "tickets", source = "tickets")
     OrderResponse toResponse(Order order);
 
     @Mapping(target = "ticketTypeName", source = "ticketType.name")

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.lagab.eventz.app.domain.order.model.OrderStatus;
+import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
 
 /**
  * Record representing the response when creating an order
@@ -30,7 +31,8 @@ public record OrderResponse(
 
         // Next steps
         LocalDateTime expiresAt, // Reservation expiration
-        String notes
+        String notes,
+        List<TicketDTO> tickets
 ) {
 
     /**

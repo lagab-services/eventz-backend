@@ -881,7 +881,8 @@ class OrderServiceTest {
                 "Test Location",
                 "Test Address",
                 LocalDateTime.now().plusMinutes(15),
-                ""
+                "",
+                new ArrayList<>()
         );
     }
 
