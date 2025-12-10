@@ -65,6 +65,15 @@ public class AttendeeController {
         return ResponseEntity.ok(transferred);
     }
 
+    @GetMapping("/ticket/{ticketId}/download")
+    public ResponseEntity<byte[]> downloadTicket(@PathVariable Long ticketId) {
+        byte[] pdf = attendeeService.downloadTicket(ticketId);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=ticket-" + ticketId + ".pdf")
+                .header("Content-Type", "application/pdf")
+                .body(pdf);
+    }
+
     /*@PostMapping("/event/{eventId}/bulk-check-in")
     public ResponseEntity<BulkCheckInResponse> bulkCheckIn(
             @PathVariable Long eventId,
@@ -78,14 +87,4 @@ public class AttendeeController {
         attendeeService.sendEventReminders(eventId);
         return ResponseEntity.ok().build();
     }*/
-
-   /* @GetMapping("/{attendeeId}/ticket")
-    public ResponseEntity<byte[]> downloadTicket(@PathVariable Long attendeeId) {
-        byte[] ticketPdf = attendeeService.generateTicketPdf(attendeeId);
-        return ResponseEntity.ok()
-                             .header("Content-Type", "application/pdf")
-                             .header("Content-Disposition", "attachment; filename=ticket.pdf")
-                             .body(ticketPdf);
-    }*/
 }
-

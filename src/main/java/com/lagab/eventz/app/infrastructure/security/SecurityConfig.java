@@ -65,6 +65,7 @@ public class SecurityConfig {
                                     "/h2-console/**",
                                     "/api/v1/events/**",
                                     "/api/v1/custom-fields/event/**",
+                                    "/api/attendees/ticket/**",
                                     "/api/guest/orders",
                                     "/api/orders/checkout",
                                     "/api/v1/cart/**",

@@ -190,6 +190,16 @@ public class AttendeeService {
         return pdfService.generateTicket(dto);
     }
 
+    @Transactional(readOnly = true)
+    public byte[] downloadTicket(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found for id: " + ticketId));
+        TicketDTO dto = ticketMapper.toDto(ticket);
+        String qrCodeBase64 = generateQrCode(ticket);
+        dto.setQrCode(qrCodeBase64);
+        return pdfService.generateTicket(dto);
+    }
+
     private String generateQrCode(Ticket ticket) {
         String qrCodeData = String.format("%s-%s",
                 ticket.getTicketCode().substring(1),

@@ -21,6 +21,7 @@ import com.lagab.eventz.app.domain.ticket.mapper.TicketMapper;
 import com.lagab.eventz.app.domain.ticket.repository.TicketRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +82,7 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
+    @Transactional(readOnly = true)
     public Page<TicketDTO> getTicketsByAttendeeEmail(String email, Pageable pageable) {
         Page<Ticket> tickets = ticketRepository.findByAttendeeEmail(email, pageable);
         return tickets.map(ticketMapper::toDto);

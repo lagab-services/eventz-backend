@@ -50,10 +50,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
+import com.lagab.eventz.app.domain.ticket.mapper.TicketMapper;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AttendeeService Tests")
@@ -67,6 +70,15 @@ class AttendeeServiceTest {
 
     @Mock
     private TicketRepository ticketRepository;
+
+    @Mock
+    private PdfService pdfService;
+
+    @Mock
+    private TicketMapper ticketMapper;
+
+    @Mock
+    private QrCodeService qrCodeService;
 
     @InjectMocks
     private AttendeeService attendeeService;
@@ -1024,6 +1036,77 @@ class AttendeeServiceTest {
             assertDoesNotThrow(() -> attendeeService.transferTicket(1L, transferRequest));
             verify(attendeeRepository).delete(testAttendee);
             verify(attendeeRepository).save(any(Attendee.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("Download Ticket Tests")
+    class DownloadTicketTests {
+        @Test
+        @DisplayName("Should download ticket successfully")
+        void shouldDownloadTicketSuccessfully() {
+            // Given
+            Long ticketId = 1L;
+            Ticket ticket = testTicket;
+            TicketDTO ticketDTO = new TicketDTO();
+            String qrCode = "qrCodeBase64";
+            byte[] pdfBytes = new byte[]{1, 2, 3};
+
+            when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+            when(ticketMapper.toDto(ticket)).thenReturn(ticketDTO);
+            when(qrCodeService.generateQrCodeBase64(any(String.class), any(Integer.class), any(Integer.class))).thenReturn(qrCode);
+            when(pdfService.generateTicket(ticketDTO)).thenReturn(pdfBytes);
+
+            // When
+            byte[] result = attendeeService.downloadTicket(ticketId);
+
+            // Then
+            assertNotNull(result);
+            assertEquals(pdfBytes, result);
+            // Verify
+            verify(ticketRepository).findById(ticketId);
+            verify(ticketMapper).toDto(ticket);
+            verify(qrCodeService).generateQrCodeBase64(any(String.class), any(Integer.class), any(Integer.class));
+            verify(pdfService).generateTicket(ticketDTO);
+        }
+
+        @Test
+        @DisplayName("Should throw ResourceNotFoundException when ticket not found")
+        void shouldThrowWhenTicketNotFound() {
+            // Given
+            Long ticketId = 99L;
+            when(ticketRepository.findById(ticketId)).thenReturn(Optional.empty());
+
+            // When / Then
+            assertThrows(ResourceNotFoundException.class, () -> attendeeService.downloadTicket(ticketId));
+            // Verify
+            verify(ticketRepository).findById(ticketId);
+            verify(ticketMapper, never()).toDto(any());
+            verify(qrCodeService, never()).generateQrCodeBase64(any(), anyInt(), anyInt());
+            verify(pdfService, never()).generateTicket(any());
+        }
+
+        @Test
+        @DisplayName("Should propagate exception if PDF generation fails")
+        void shouldPropagateExceptionIfPdfFails() {
+            // Given
+            Long ticketId = 1L;
+            Ticket ticket = testTicket;
+            TicketDTO ticketDTO = new TicketDTO();
+            String qrCode = "qrCodeBase64";
+
+            when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+            when(ticketMapper.toDto(ticket)).thenReturn(ticketDTO);
+            when(qrCodeService.generateQrCodeBase64(any(String.class), any(Integer.class), any(Integer.class))).thenReturn(qrCode);
+            when(pdfService.generateTicket(ticketDTO)).thenThrow(new RuntimeException("PDF error"));
+
+            // When / Then
+            assertThrows(RuntimeException.class, () -> attendeeService.downloadTicket(ticketId));
+            // Verify
+            verify(ticketRepository).findById(ticketId);
+            verify(ticketMapper).toDto(ticket);
+            verify(qrCodeService).generateQrCodeBase64(any(String.class), any(Integer.class), any(Integer.class));
+            verify(pdfService).generateTicket(ticketDTO);
         }
     }
 
