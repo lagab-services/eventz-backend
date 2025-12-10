@@ -871,6 +871,7 @@ class OrderServiceTest {
                 "ORD-123456",
                 OrderStatus.PENDING,
                 BigDecimal.valueOf(100.00),
+                BigDecimal.ZERO,
                 BigDecimal.valueOf(5.00),
                 LocalDateTime.now(),
                 items,

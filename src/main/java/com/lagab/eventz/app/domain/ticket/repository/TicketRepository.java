@@ -29,4 +29,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
 
     @Query("SELECT t FROM Ticket t WHERE t.status IN :statuses ORDER BY t.createdAt DESC")
     Page<Ticket> findByUserIdAndStatusIn(@Param("statuses") List<TicketStatus> statuses, Pageable pageable);
+
+    @Query("SELECT t FROM Ticket t WHERE t.attendee.email = :email")
+    Page<Ticket> findByAttendeeEmail(@Param("email") String email, Pageable pageable);
 }

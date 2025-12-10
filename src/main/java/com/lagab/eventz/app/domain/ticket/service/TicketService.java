@@ -5,15 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.lagab.eventz.app.common.exception.BusinessException;
 import com.lagab.eventz.app.common.exception.ResourceNotFoundException;
 import com.lagab.eventz.app.domain.order.model.Order;
 import com.lagab.eventz.app.domain.order.model.OrderItem;
+import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
 import com.lagab.eventz.app.domain.ticket.entity.Attendee;
 import com.lagab.eventz.app.domain.ticket.entity.Ticket;
 import com.lagab.eventz.app.domain.ticket.entity.TicketStatus;
+import com.lagab.eventz.app.domain.ticket.mapper.TicketMapper;
 import com.lagab.eventz.app.domain.ticket.repository.TicketRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final AttendeeService attendeeService;
+    private final TicketMapper ticketMapper;
 
     public List<Ticket> generateTicketsForOrder(Order order) {
         List<Ticket> tickets = new ArrayList<>();
@@ -74,6 +79,11 @@ public class TicketService {
         ticket.setCheckInTime(LocalDateTime.now());
 
         return ticketRepository.save(ticket);
+    }
+
+    public Page<TicketDTO> getTicketsByAttendeeEmail(String email, Pageable pageable) {
+        Page<Ticket> tickets = ticketRepository.findByAttendeeEmail(email, pageable);
+        return tickets.map(ticketMapper::toDto);
     }
 
     private String generateTicketCode() {

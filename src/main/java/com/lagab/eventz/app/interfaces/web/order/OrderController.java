@@ -18,6 +18,8 @@ import com.lagab.eventz.app.domain.order.dto.CheckoutResponse;
 import com.lagab.eventz.app.domain.order.dto.OrderRequest;
 import com.lagab.eventz.app.domain.order.dto.OrderResponse;
 import com.lagab.eventz.app.domain.order.service.OrderService;
+import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
+import com.lagab.eventz.app.domain.ticket.service.TicketService;
 import com.lagab.eventz.app.util.SecurityUtils;
 import com.stripe.model.checkout.Session;
 
@@ -38,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderController {
 
     private final OrderService orderService;
+    private final TicketService ticketService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Create checkout session", description = "Create Stripe checkout session from cart")
@@ -57,15 +60,15 @@ public class OrderController {
         String sessionId = getSessionId(request);
         Session stripeSession = orderService.createCheckoutSession(sessionId, userId, orderRequest);
 
-        String orderId = null;
+        String orderNumber = null;
         if (stripeSession.getMetadata() != null) {
-            orderId = stripeSession.getMetadata().get("order_id");
+            orderNumber = stripeSession.getMetadata().get("order_number");
         }
 
         CheckoutResponse response = CheckoutResponse.builder()
                                                     .checkoutUrl(stripeSession.getUrl())
                                                     .sessionId(stripeSession.getId())
-                                                    .orderId(orderId)
+                                                    .orderId(orderNumber)
                                                     .expiresAt(stripeSession.getExpiresAt())
                                                     .build();
 
@@ -140,6 +143,23 @@ public class OrderController {
 
         return ResponseEntity.ok(response);
 
+    }
+
+    @GetMapping("/user/tickets")
+    @Operation(summary = "Get user tickets", description = "Retrieve all tickets for the authenticated user (by attendee email)")
+    @ApiResponse(responseCode = "200", description = "Tickets retrieved successfully")
+    public ResponseEntity<Page<TicketDTO>> getUsersTickets(@PageableDefault(size = 20) Pageable pageable) {
+        String email = null;
+        try {
+            email = SecurityUtils.getCurrentUserEmail();
+        } catch (UnauthorizedException e) {
+            log.warn("User not authenticated, proceeding without email");
+        }
+        if (email == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Page<TicketDTO> tickets = ticketService.getTicketsByAttendeeEmail(email, pageable);
+        return ResponseEntity.ok(tickets);
     }
 
 }

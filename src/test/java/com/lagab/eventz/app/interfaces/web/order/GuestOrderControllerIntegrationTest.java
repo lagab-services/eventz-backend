@@ -61,6 +61,7 @@ class GuestOrderControllerIntegrationTest {
                 OrderStatus.PAID,
                 BigDecimal.TEN,
                 BigDecimal.ZERO,
+                BigDecimal.ZERO,
                 LocalDateTime.now(),
                 List.of(),
                 "My Event",

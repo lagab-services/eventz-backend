@@ -70,7 +70,7 @@ public class StripeService {
                                                                            .setSuccessUrl(getSuccessUrl(request))
                                                                            .setCancelUrl(getCancelUrl(request))
                                                                            .addAllLineItem(lineItems)
-                                                                           .putMetadata("order_id", order.getOrderNumber())
+                                                                           .putMetadata("order_id", order.getId().toString())
                                                                            .putMetadata("order_number", order.getOrderNumber())
                                                                            .setExpiresAt(order.getPaymentDeadline()
                                                                                               .toEpochSecond(java.time.ZoneOffset.UTC));

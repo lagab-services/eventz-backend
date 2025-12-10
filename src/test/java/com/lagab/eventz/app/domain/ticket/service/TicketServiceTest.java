@@ -29,6 +29,11 @@ import com.lagab.eventz.app.domain.ticket.entity.Ticket;
 import com.lagab.eventz.app.domain.ticket.entity.TicketStatus;
 import com.lagab.eventz.app.domain.ticket.repository.TicketRepository;
 import com.lagab.eventz.app.domain.user.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import com.lagab.eventz.app.domain.ticket.dto.TicketDTO;
+import com.lagab.eventz.app.domain.ticket.mapper.TicketMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -50,6 +55,9 @@ class TicketServiceTest {
 
     @Mock
     private AttendeeService attendeeService;
+
+    @Mock
+    private TicketMapper ticketMapper;
 
     @InjectMocks
     private TicketService ticketService;
@@ -652,6 +660,99 @@ class TicketServiceTest {
             // Verify service interactions
             verify(attendeeService).findUnassignedAttendees(testOrder.getId());
             verify(ticketRepository).saveAll(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Tickets By Attendee Email Tests")
+    class GetTicketsByAttendeeEmailTests {
+        @Test
+        @DisplayName("Should return tickets for existing attendee email")
+        void shouldReturnTicketsForExistingAttendeeEmail() {
+            // Given
+            String email = "john@example.com";
+            Ticket ticket = new Ticket();
+            ticket.setId(1L);
+            ticket.setTicketCode("TKT-123456789ABC");
+            Attendee attendee = new Attendee();
+            attendee.setEmail(email);
+            ticket.setAttendee(attendee);
+            Page<Ticket> ticketPage = new PageImpl<>(List.of(ticket), PageRequest.of(0, 20), 1);
+            TicketDTO ticketDTO = TicketDTO.builder().ticketNumber("TKT-123456789ABC").build();
+            when(ticketRepository.findByAttendeeEmail(email, PageRequest.of(0, 20))).thenReturn(ticketPage);
+            when(ticketMapper.toDto(ticket)).thenReturn(ticketDTO);
+            // When
+            Page<TicketDTO> result = ticketService.getTicketsByAttendeeEmail(email, PageRequest.of(0, 20));
+            // Then
+            assertEquals(1, result.getTotalElements());
+            assertEquals("TKT-123456789ABC", result.getContent().get(0).getTicketNumber());
+            // Verify
+            verify(ticketRepository).findByAttendeeEmail(email, PageRequest.of(0, 20));
+            verify(ticketMapper).toDto(ticket);
+        }
+
+        @Test
+        @DisplayName("Should return empty page for unknown attendee email")
+        void shouldReturnEmptyPageForUnknownAttendeeEmail() {
+            // Given
+            String email = "unknown@example.com";
+            Page<Ticket> ticketPage = new PageImpl<>(List.of(), PageRequest.of(0, 20), 0);
+            when(ticketRepository.findByAttendeeEmail(email, PageRequest.of(0, 20))).thenReturn(ticketPage);
+            // When
+            Page<TicketDTO> result = ticketService.getTicketsByAttendeeEmail(email, PageRequest.of(0, 20));
+            // Then
+            assertTrue(result.isEmpty());
+            // Verify
+            verify(ticketRepository).findByAttendeeEmail(email, PageRequest.of(0, 20));
+            verify(ticketMapper, never()).toDto(any());
+        }
+
+        @Test
+        @DisplayName("Should handle null email gracefully")
+        void shouldHandleNullEmailGracefully() {
+            // Given
+            String email = null;
+            Page<Ticket> ticketPage = new PageImpl<>(List.of(), PageRequest.of(0, 20), 0);
+            when(ticketRepository.findByAttendeeEmail(email, PageRequest.of(0, 20))).thenReturn(ticketPage);
+            // When
+            Page<TicketDTO> result = ticketService.getTicketsByAttendeeEmail(email, PageRequest.of(0, 20));
+            // Then
+            assertTrue(result.isEmpty());
+            // Verify
+            verify(ticketRepository).findByAttendeeEmail(email, PageRequest.of(0, 20));
+            verify(ticketMapper, never()).toDto(any());
+        }
+
+        @Test
+        @DisplayName("Should respect pagination parameters")
+        void shouldRespectPaginationParameters() {
+            // Given
+            String email = "john@example.com";
+            Ticket ticket1 = new Ticket();
+            ticket1.setId(1L);
+            ticket1.setTicketCode("TKT-1");
+            Attendee attendee1 = new Attendee();
+            attendee1.setEmail(email);
+            ticket1.setAttendee(attendee1);
+            Ticket ticket2 = new Ticket();
+            ticket2.setId(2L);
+            ticket2.setTicketCode("TKT-2");
+            Attendee attendee2 = new Attendee();
+            attendee2.setEmail(email);
+            ticket2.setAttendee(attendee2);
+            List<Ticket> tickets = List.of(ticket1, ticket2);
+            Page<Ticket> ticketPage = new PageImpl<>(tickets, PageRequest.of(0, 1), 2);
+            when(ticketRepository.findByAttendeeEmail(email, PageRequest.of(0, 1))).thenReturn(ticketPage);
+            when(ticketMapper.toDto(ticket1)).thenReturn(TicketDTO.builder().ticketNumber("TKT-1").build());
+            when(ticketMapper.toDto(ticket2)).thenReturn(TicketDTO.builder().ticketNumber("TKT-2").build());
+            // When
+            Page<TicketDTO> result = ticketService.getTicketsByAttendeeEmail(email, PageRequest.of(0, 1));
+            // Then
+            assertEquals(2, result.getTotalElements());
+            assertEquals("TKT-1", result.getContent().get(0).getTicketNumber());
+            // Verify
+            verify(ticketRepository).findByAttendeeEmail(email, PageRequest.of(0, 1));
+            verify(ticketMapper).toDto(ticket1);
         }
     }
 

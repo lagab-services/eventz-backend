@@ -15,6 +15,7 @@ public record OrderResponse(
         String orderNumber,
         OrderStatus status,
         BigDecimal totalAmount,
+        BigDecimal discountAmount,
         BigDecimal feesAmount,
         LocalDateTime createdAt,
 
