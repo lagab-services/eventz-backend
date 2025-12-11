@@ -34,7 +34,6 @@ public class EventService {
     private final EventMapper eventMapper;
     private final AddressService addressService;
     private final OrganizationService organizationService;
-    //private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
     public EventDTO getEventById(Long id) {
@@ -103,11 +102,6 @@ public class EventService {
             throw new UnauthorizedException("You are not authorized to delete this event");
         }
 
-        // Check if event can be deleted (no orders or past events)
-       /* if (event.getOrders() != null && !event.getOrders().isEmpty()) {
-            throw new IllegalStateException("Cannot delete event with existing orders");
-        }*/
-
         eventRepository.delete(event);
         log.debug("Event deleted successfully with ID: {}", id);
     }
@@ -163,7 +157,7 @@ public class EventService {
     }
 
     // Private helper methods
-    private Event findEventById(Long id) {
+    public Event findEventById(Long id) {
         return eventRepository.findById(id)
                               .orElseThrow(() -> new EventNotFoundException("Event not found with ID: " + id));
     }
@@ -182,7 +176,7 @@ public class EventService {
                 dto.isPublic(), dto.isFree(), dto.currency(), dto.createdAt(),
                 dto.updatedAt(), dto.organizerId(), dto.organizerName(),
                 dto.organizationId(), dto.organizationName(),
-                dto.address(), dto.ticketTypes(), averageRating, reviewCount
+                dto.address(), dto.ticketTypes(), dto.ticketCategories(), averageRating, reviewCount
         );
     }
 

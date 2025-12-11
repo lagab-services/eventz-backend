@@ -1,0 +1,17 @@
+package com.lagab.eventz.app.config;
+
+import org.springframework.security.test.context.support.WithSecurityContext;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
+@WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory.class)
+public @interface WithMockCustomUser {
+
+    long id() default 42L;
+
+    String email() default "integration.test@lagab.com";
+
+    String[] roles() default {"USER"};
+}

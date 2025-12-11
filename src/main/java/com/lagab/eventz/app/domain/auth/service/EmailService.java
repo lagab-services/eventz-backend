@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.lagab.eventz.app.common.dto.EmailRequest;
 import com.lagab.eventz.app.domain.org.dto.OrganizationDto;
 import com.lagab.eventz.app.domain.user.model.User;
 
@@ -88,7 +89,6 @@ public class EmailService {
             templateModel.put("validationLink", validationLink);
             templateModel.put("name", user.getFullName());
             templateModel.put("logo", logoUrl);
-            templateModel.put("locale", locale.getLanguage());
 
             // Create Thymeleaf context
             Context context = new Context(locale, templateModel);
@@ -232,6 +232,19 @@ public class EmailService {
             return CompletableFuture.completedFuture(null);
         } catch (Exception e) {
             log.error("Failed to send invitation email to: {}", email, e);
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
+    @Async
+    public CompletableFuture<Void> sendEmail(EmailRequest emailRequest) {
+
+        try {
+            sendHtmlEmail(emailRequest.getTo(), emailRequest.getSubject(), emailRequest.getHtmlContent());
+
+            return CompletableFuture.completedFuture(null);
+        } catch (Exception e) {
+            log.error("Failed to send email to: {}", emailRequest.getTo(), e);
             return CompletableFuture.failedFuture(e);
         }
     }

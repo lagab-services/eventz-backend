@@ -1,18 +1,17 @@
 package com.lagab.eventz.app.domain.org.model;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,36 +56,12 @@ public class Organization {
     private String logo;
 
     @JsonIgnore
-    @Column(name = "metadata", columnDefinition = "JSON")
-    private String metadataJson;
+    @Column(name = "metadata", columnDefinition = "jsonb")
+    @Type(JsonType.class)
+    private Map<String, Object> metadata;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("organization")
     private List<OrganizationMembership> memberships;
-
-    // Metadata handling methods
-    public Map<String, Object> getMetadata() {
-        if (metadataJson == null || metadataJson.isEmpty()) {
-            return new HashMap<>();
-        }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(metadataJson, Map.class);
-        } catch (JsonProcessingException e) {
-            return new HashMap<>();
-        }
-    }
-
-    public void setMetadata(Map<String, Object> metadata) {
-        if (metadata == null) {
-            this.metadataJson = null;
-            return;
-        }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            this.metadataJson = mapper.writeValueAsString(metadata);
-        } catch (JsonProcessingException e) {
-            this.metadataJson = null;
-        }
-    }
+    
 }

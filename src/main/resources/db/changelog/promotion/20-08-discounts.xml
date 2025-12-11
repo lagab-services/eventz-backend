@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.11.xsd">
+
+    <changeSet id="2025-08-20-01-create-discounts" author="lagab">
+        <createTable tableName="discounts">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="amount_off" type="DECIMAL(10,2)"/>
+            <column name="percent_off" type="DECIMAL(5,2)"/>
+            <column name="event_id" type="BIGINT"/>
+            <column name="ticket_category_id" type="BIGINT"/>
+            <column name="quantity_available" type="INT"/>
+            <column name="quantity_sold" type="INT" defaultValueNumeric="0"/>
+            <column name="start_date" type="TIMESTAMP"/>
+            <column name="end_date" type="TIMESTAMP"/>
+            <column name="end_date_relative_seconds" type="INT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="discounts" baseColumnNames="event_id"
+                                 constraintName="fk_discounts_event"
+                                 referencedTableName="events" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="discounts" baseColumnNames="ticket_category_id"
+                                 constraintName="fk_discounts_ticket_category"
+                                 referencedTableName="ticket_categories" referencedColumnNames="id"/>
+        <createIndex tableName="discounts" indexName="idx_discounts_code">
+            <column name="code"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2025-08-20-02-create-discount-ticket-types" author="lagab">
+        <createTable tableName="discount_ticket_types">
+            <column name="discount_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ticket_type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="discount_ticket_types" columnNames="discount_id, ticket_type_id" constraintName="pk_discount_ticket_types"/>
+        <addForeignKeyConstraint baseTableName="discount_ticket_types" baseColumnNames="discount_id"
+                                 constraintName="fk_dtt_discount"
+                                 referencedTableName="discounts" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="discount_ticket_types" baseColumnNames="ticket_type_id"
+                                 constraintName="fk_dtt_ticket_type"
+                                 referencedTableName="ticket_types" referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

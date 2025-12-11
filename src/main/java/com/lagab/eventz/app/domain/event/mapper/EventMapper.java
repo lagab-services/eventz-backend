@@ -24,6 +24,7 @@ public interface EventMapper {
     @Mapping(source = "organization", target = "organizationName", qualifiedByName = "formatOrganizationName")
     @Mapping(target = "averageRating", ignore = true)
     @Mapping(target = "reviewCount", ignore = true)
+    @Mapping(target = "ticketCategories", source = "ticketCategories")
     EventDTO toDto(Event event);
 
     @Mapping(target = "id", ignore = true)
@@ -33,8 +34,7 @@ public interface EventMapper {
     @Mapping(target = "organizer", ignore = true)
     @Mapping(target = "organization", ignore = true)
     @Mapping(target = "ticketTypes", ignore = true)
-        //@Mapping(target = "orders", ignore = true)
-        //@Mapping(target = "reviews", ignore = true)
+    @Mapping(target = "ticketCategories", ignore = true)
     Event toEntity(CreateEventDTO dto);
 
     @Mapping(target = "id", ignore = true)
@@ -43,8 +43,7 @@ public interface EventMapper {
     @Mapping(target = "organizer", ignore = true)
     @Mapping(target = "organization", ignore = true)
     @Mapping(target = "ticketTypes", ignore = true)
-    //@Mapping(target = "orders", ignore = true)
-    //@Mapping(target = "reviews", ignore = true)
+    @Mapping(target = "ticketCategories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(UpdateEventDTO dto, @MappingTarget Event event);
 

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd" objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="attendee-custom-fields-0001" author="lagab">
+        <createTable tableName="attendee_custom_fields">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_attendee_custom_fields" nullable="false"/>
+            </column>
+            <column name="field_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="field_value" type="TEXT"/>
+            <column name="attendee_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_field_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="attendee-custom-fields-0002" author="lagab">
+        <addForeignKeyConstraint baseTableName="attendee_custom_fields"
+                                 baseColumnNames="attendee_id"
+                                 constraintName="fk_acf_attendee"
+                                 referencedTableName="attendees"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="attendee-custom-fields-0003" author="lagab">
+        <addForeignKeyConstraint baseTableName="attendee_custom_fields"
+                                 baseColumnNames="event_field_id"
+                                 constraintName="fk_acf_event_field"
+                                 referencedTableName="event_custom_fields"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <!--<changeSet id="attendee-custom-fields-idx-0001" author="lagab">
+        <createIndex indexName="idx_acf_attendee_id" tableName="attendee_custom_fields">
+            <column name="attendee_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="attendee-custom-fields-idx-0002" author="lagab">
+        <createIndex indexName="idx_acf_event_field_id" tableName="attendee_custom_fields">
+            <column name="event_field_id"/>
+        </createIndex>
+    </changeSet>-->
+
+</databaseChangeLog>

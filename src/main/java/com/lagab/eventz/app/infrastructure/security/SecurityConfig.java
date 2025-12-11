@@ -61,8 +61,17 @@ public class SecurityConfig {
                                     "/api/auth/reset-password",
                                     "/api/auth/verify-email",
                                     "/api/auth/resend-verification",
+                                    "/api/guest/orders/**",
                                     "/h2-console/**",
-                                    "/actuator/health"
+                                    "/api/v1/events/**",
+                                    "/api/v1/custom-fields/event/**",
+                                    "/api/attendees/ticket/**",
+                                    "/api/guest/orders",
+                                    "/api/orders/checkout",
+                                    "/api/v1/cart/**",
+                                    "/api/cart/**",
+                                    "/actuator/health",
+                                    "/webhook/stripe"
                             ).permitAll()
 
                             // Specific endpoints requiring authentication

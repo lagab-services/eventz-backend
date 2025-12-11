@@ -12,8 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.lagab.eventz.app.domain.event.model.TicketType;
 import com.lagab.eventz.app.domain.event.projection.TicketTypeStatsProjection;
-import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 
 @Repository
 public interface TicketTypeRepository extends JpaRepository<TicketType, Long> {
@@ -83,4 +83,7 @@ public interface TicketTypeRepository extends JpaRepository<TicketType, Long> {
 
     // Ticket types sorted by order
     List<TicketType> findByEventIdOrderBySortOrderAscIdAsc(Long eventId);
+
+    @Query("SELECT tt FROM TicketType tt WHERE tt.event.id = :eventId AND tt.category IS NULL ORDER BY tt.sortOrder ASC, tt.price ASC")
+    List<TicketType> findUncategorizedByEventId(@Param("eventId") Long eventId);
 }

@@ -16,4 +16,14 @@
     <include file="db/changelog/org/26-01-organization-invitations.xml"/>
     <include file="db/changelog/org/07-01-role-permissions.xml"/>
     <include file="db/changelog/event/event-org.xml"/>
+    <include file="db/changelog/event/11-01-ticket-categories.xml"/>
+    <include file="db/changelog/event/00000000000008_event_custom_fields.xml"/>
+    <include file="db/changelog/ticket/00000000000010_attendees.xml"/>
+    <include file="db/changelog/ticket/00000000000009_tickets.xml"/>
+    <include file="db/changelog/ticket/00000000000011_attendee_custom_fields.xml"/>
+    <include file="db/changelog/promotion/20-08-discounts.xml"/>
+
+    <include file="db/changelog/order/00000000000012_orders.xml"/>
+    <include file="db/changelog/order/00000000000013_order_items.xml"/>
+    <include file="db/changelog/payment/00000000000014_payments.xml"/>
 </databaseChangeLog>

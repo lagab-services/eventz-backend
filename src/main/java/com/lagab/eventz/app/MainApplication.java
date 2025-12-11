@@ -3,7 +3,6 @@ package com.lagab.eventz.app;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,8 +31,6 @@ public class MainApplication {
     @PostConstruct
     public void initApplication() {
         log.info("Running with Spring profile(s) : {}", Arrays.toString(env.getActiveProfiles()));
-        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-
     }
 
     /**
@@ -43,7 +40,6 @@ public class MainApplication {
      */
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(MainApplication.class);
-        //DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
         try {
             log.info("""

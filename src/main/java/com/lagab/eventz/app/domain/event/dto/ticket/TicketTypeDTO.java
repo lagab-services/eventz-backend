@@ -10,13 +10,13 @@ public record TicketTypeDTO(
         @Schema(description = "Unique identifier of the ticket type", example = "123")
         Long id,
 
-        @Schema(description = "Name of the ticket type", example = "VIP Pass", required = true)
+        @Schema(description = "Name of the ticket type", example = "VIP Pass")
         String name,
 
         @Schema(description = "Description of the ticket type", example = "Access to VIP lounge and premium seating")
         String description,
 
-        @Schema(description = "Price of the ticket", example = "199.99", required = true)
+        @Schema(description = "Price of the ticket", example = "199.99")
         BigDecimal price,
 
         @Schema(description = "Number of tickets available for purchase", example = "100")
@@ -43,6 +43,13 @@ public record TicketTypeDTO(
         @Schema(description = "DEPRECATED - Use quantityRemaining instead")
         Integer remainingTickets,
 
+        // Category information
+        @Schema(description = "ID of the category this ticket type belongs to", example = "456")
+        Long categoryId,
+
+        @Schema(description = "Name of the category this ticket type belongs to", example = "VIP")
+        String categoryName,
+
         // Computed fields
         @Schema(description = "Calculated number of tickets remaining (quantityAvailable - quantitySold)", example = "50")
         Integer quantityRemaining,
@@ -51,9 +58,15 @@ public record TicketTypeDTO(
         BigDecimal totalPrice,
 
         @Schema(description = "Indicates if tickets are currently on sale (based on sale dates and availability)", example = "true")
-        Boolean isOnSale,
+        boolean isOnSale,
 
         @Schema(description = "Indicates if all tickets of this type have been sold out", example = "false")
-        Boolean isSoldOut
+        boolean isSoldOut,
+
+        @Schema(description = "ID of the event this ticket type belongs to", example = "456")
+        Long eventId,
+
+        @Schema(description = "Name of the event this ticket type belongs to", example = "Festival")
+        String eventName
 ) {
 }

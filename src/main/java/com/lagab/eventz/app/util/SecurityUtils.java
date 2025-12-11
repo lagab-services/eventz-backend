@@ -30,6 +30,19 @@ public class SecurityUtils {
     }
 
     /**
+     * Extract user ID from Spring Security Authentication
+     *
+     * @return Current user ID or null if error
+     */
+    public static Long getCurrentUserIdOrNull() {
+        try {
+            return getCurrentUserId();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Extract user email from Spring Security Authentication
      *
      * @return Current user email
