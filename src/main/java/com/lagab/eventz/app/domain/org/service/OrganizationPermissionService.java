@@ -101,7 +101,7 @@ public class OrganizationPermissionService {
         List<OrganizationRolePermission> rolePermissions = permissions.stream()
                                                                       .map(permission -> new OrganizationRolePermission(organizationId, role,
                                                                               permission, true))
-                                                                      .collect(Collectors.toList());
+                                                                      .toList();
 
         rolePermissionRepository.saveAll(rolePermissions);
     }
@@ -186,7 +186,7 @@ public class OrganizationPermissionService {
         List<OrganizationRolePermission> rolePermissions = permissions.stream()
                                                                       .map(permission -> new OrganizationRolePermission(organizationId, role,
                                                                               permission, true))
-                                                                      .collect(Collectors.toList());
+                                                                      .toList();
 
         rolePermissionRepository.saveAll(rolePermissions);
 

@@ -1,6 +1,7 @@
 package com.lagab.eventz.app.interfaces.web.event;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +20,17 @@ import com.lagab.eventz.app.domain.event.dto.ticket.CreateTicketTypeRequest;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeStatsDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.UpdateTicketTypeRequest;
+import com.lagab.eventz.app.domain.event.dto.ticket.category.CreateTicketCategoryRequest;
+import com.lagab.eventz.app.domain.event.dto.ticket.category.TicketCategoryDTO;
+import com.lagab.eventz.app.domain.event.service.TicketCategoryService;
+import com.lagab.eventz.app.domain.event.service.TicketTypeManagementService;
 import com.lagab.eventz.app.domain.event.service.TicketTypeService;
 import com.lagab.eventz.app.interfaces.web.org.annotation.RequireOrganizationPermission;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +42,8 @@ import lombok.RequiredArgsConstructor;
 public class TicketTypeController {
 
     private final TicketTypeService ticketTypeService;
+    private final TicketCategoryService ticketCategoryService;
+    private final TicketTypeManagementService ticketTypeManagementService;
 
     @PostMapping("/event/{eventId}")
     @Operation(summary = "Create a new ticket type")
@@ -142,6 +151,97 @@ public class TicketTypeController {
             @RequestBody List<Long> ticketTypeIds) {
         var ticketTypes = ticketTypeService.reorderTicketTypes(eventId, ticketTypeIds);
         return ResponseEntity.ok(ticketTypes);
+    }
+
+    // Overview
+
+    @GetMapping("/event/{eventId}/overview")
+    @Operation(
+            summary = "Get ticket overview",
+            description = "Retrieves a complete overview of all tickets and categories for an event"
+    )
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
+    public ResponseEntity<Map<String, Object>> getTicketOverview(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId) {
+
+        var categories = ticketCategoryService.getTicketCategoriesByEventId(eventId);
+        var uncategorizedTickets = ticketTypeService.getUncategorizedTicketTypes(eventId);
+        var groupedTickets = ticketTypeManagementService.getTicketTypesGroupedByCategory(eventId);
+
+        var overview = Map.of(
+                "categories", categories,
+                "uncategorizedTickets", uncategorizedTickets,
+                "groupedTickets", groupedTickets,
+                "totalCategories", categories.size(),
+                "totalUncategorized", uncategorizedTickets.size()
+        );
+
+        return ResponseEntity.ok(overview);
+    }
+
+    @GetMapping("/event/{eventId}/public")
+    @Operation(
+            summary = "Get public ticket information",
+            description = "Retrieves ticket information visible to the public (active categories and on-sale tickets)"
+    )
+    public ResponseEntity<Map<String, List<TicketTypeDTO>>> getPublicTickets(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId) {
+        var publicTickets = ticketTypeManagementService.getOnSaleTicketTypesGroupedByCategory(eventId);
+        return ResponseEntity.ok(publicTickets);
+    }
+
+    // Category Management
+
+    @PostMapping("/event/{eventId}/categories")
+    @Operation(summary = "Create ticket category", description = "Creates a new ticket category for the event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Category created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "409", description = "Category name already exists")
+    })
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
+    public ResponseEntity<TicketCategoryDTO> createCategory(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId,
+            @Valid @RequestBody CreateTicketCategoryRequest request) {
+        var category = ticketCategoryService.createTicketCategory(eventId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
+    }
+
+    @GetMapping("/event/{eventId}/categories")
+    @Operation(summary = "Get all categories", description = "Retrieves all ticket categories for the event")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
+    public ResponseEntity<List<TicketCategoryDTO>> getCategories(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId) {
+        var categories = ticketCategoryService.getTicketCategoriesByEventId(eventId);
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/event/{eventId}/categories/active")
+    @Operation(summary = "Get active categories", description = "Retrieves only active ticket categories for the event")
+    public ResponseEntity<List<TicketCategoryDTO>> getActiveCategories(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId) {
+        var categories = ticketCategoryService.getActiveTicketCategoriesByEventId(eventId);
+        return ResponseEntity.ok(categories);
+    }
+
+    @PutMapping("/event/{eventId}/categories/reorder")
+    @Operation(summary = "Reorder categories", description = "Changes the display order of ticket categories")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
+    public ResponseEntity<List<TicketCategoryDTO>> reorderCategories(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId,
+            @RequestBody List<Long> categoryIds) {
+        var categories = ticketCategoryService.reorderTicketCategories(eventId, categoryIds);
+        return ResponseEntity.ok(categories);
+    }
+
+    @DeleteMapping("/event/{eventId}/categories/{categoryId}")
+    @Operation(summary = "Delete category", description = "Deletes a ticket category and moves its tickets to uncategorized")
+    @RequireOrganizationPermission(permission = "EVENT_EDIT")
+    public ResponseEntity<Void> deleteCategory(
+            @Parameter(description = "Event ID", required = true) @PathVariable Long eventId,
+            @Parameter(description = "Category ID", required = true) @PathVariable Long categoryId) {
+        ticketCategoryService.deleteTicketCategory(categoryId);
+        return ResponseEntity.noContent().build();
     }
 
 }

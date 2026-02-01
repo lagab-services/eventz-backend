@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeDTO;
+import com.lagab.eventz.app.domain.event.dto.ticket.category.TicketCategoryDTO;
 import com.lagab.eventz.app.domain.event.model.EventStatus;
 import com.lagab.eventz.app.domain.event.model.EventType;
 
@@ -34,6 +35,7 @@ public record EventDTO(
         String organizationName,
         AddressDTO address,
         List<TicketTypeDTO> ticketTypes,
+        List<TicketCategoryDTO> ticketCategories,
         Double averageRating,
         Long reviewCount
 ) {

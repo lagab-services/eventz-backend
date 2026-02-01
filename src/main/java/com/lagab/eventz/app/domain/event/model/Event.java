@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lagab.eventz.app.domain.org.model.Organization;
-import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 import com.lagab.eventz.app.domain.user.model.User;
 
 import jakarta.persistence.CascadeType;
@@ -103,25 +102,15 @@ public class Event {
     @OneToOne(mappedBy = "event", cascade = CascadeType.ALL)
     private Address address;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TicketType> ticketTypes;
 
-    /*@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-    private List<Order> orders;*/
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TicketCategory> ticketCategories;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", nullable = false)
     @JsonIgnoreProperties("events")
     private Organization organization;
 
-    /*@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-    private List<Review> reviews;*/
-
-   /* @ManyToMany
-    @JoinTable(
-            name = "event_categories",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private List<Category> categories;*/
 }

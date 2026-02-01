@@ -22,11 +22,13 @@ import com.lagab.eventz.app.domain.event.dto.ticket.TicketTypeStatsDTO;
 import com.lagab.eventz.app.domain.event.dto.ticket.UpdateTicketTypeRequest;
 import com.lagab.eventz.app.domain.event.mapper.TicketTypeMapper;
 import com.lagab.eventz.app.domain.event.model.Event;
+import com.lagab.eventz.app.domain.event.model.TicketCategory;
+import com.lagab.eventz.app.domain.event.model.TicketType;
 import com.lagab.eventz.app.domain.event.projection.TicketTypeStatsProjection;
 import com.lagab.eventz.app.domain.event.repository.EventRepository;
+import com.lagab.eventz.app.domain.event.repository.TicketCategoryRepository;
 import com.lagab.eventz.app.domain.event.repository.TicketTypeRepository;
 import com.lagab.eventz.app.domain.event.service.TicketTypeService;
-import com.lagab.eventz.app.domain.ticket.entity.TicketType;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -38,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +51,9 @@ class TicketTypeServiceTest {
 
     @Mock
     private TicketTypeRepository ticketTypeRepository;
+
+    @Mock
+    private TicketCategoryRepository ticketCategoryRepository;
 
     @Mock
     private EventRepository eventRepository;
@@ -96,7 +102,8 @@ class TicketTypeServiceTest {
                 now.plusDays(1), // saleStart
                 now.plusDays(29), // saleEnd
                 1, // minQuantity
-                10 // maxQuantity
+                10, // maxQuantity
+                null
         );
 
         updateRequest = new UpdateTicketTypeRequest(
@@ -111,7 +118,8 @@ class TicketTypeServiceTest {
                 now.plusDays(28), // saleEnd
                 1, // minQuantity
                 15, // maxQuantity
-                true // isActive
+                true, // isActive
+                null
         );
 
         mockTicketTypeDTO = new TicketTypeDTO(
@@ -127,6 +135,8 @@ class TicketTypeServiceTest {
                 10, // maxQuantity
                 true, // isActive
                 100, // remainingTickets (deprecated)
+                null, //categoryId
+                null, // category name
                 100, // quantityRemaining (computed)
                 BigDecimal.ZERO, // totalPrice (computed: price * quantitySold)
                 true, // isOnSale (computed)
@@ -185,7 +195,8 @@ class TicketTypeServiceTest {
                     pastDate,
                     LocalDateTime.now().plusDays(29),
                     1, // minQuantity
-                    5 // maxQuantity
+                    5, // maxQuantity
+                    null // categoryId
             );
             when(eventRepository.findById(1L)).thenReturn(Optional.of(mockEvent));
 
@@ -211,7 +222,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     afterEventStart,
                     1, // minQuantity
-                    5 // maxQuantity
+                    5, // maxQuantity
+                    null // categoryId
             );
             when(eventRepository.findById(1L)).thenReturn(Optional.of(mockEvent));
 
@@ -220,7 +232,7 @@ class TicketTypeServiceTest {
                     .isInstanceOf(BusinessException.class)
                     .hasMessage("Sales must end before the event starts");
         }
-        
+
     }
 
     @Nested
@@ -242,7 +254,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     LocalDateTime.now().plusDays(29),
                     2, // minQuantity
-                    5 // maxQuantity
+                    5, // maxQuantity
+                    null // categoryId
             );
             List<CreateTicketTypeRequest> requests = List.of(createRequest, request2);
 
@@ -317,7 +330,7 @@ class TicketTypeServiceTest {
 
             // Then
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).id()).isEqualTo(1L);
+            assertThat(result.getFirst().id()).isEqualTo(1L);
         }
 
         @Test
@@ -391,7 +404,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(29), // saleEnd
                     1, // minQuantity
                     15, // maxQuantity
-                    true // isActive
+                    true, // isActive
+                    null
             );
             when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(mockTicketType));
             // When & Then
@@ -416,7 +430,8 @@ class TicketTypeServiceTest {
                     null, // saleEnd
                     null, // minQuantity
                     null, // maxQuantity
-                    true // isActive
+                    true, // isActive
+                    null
             );
             when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(mockTicketType));
             when(ticketTypeRepository.save(any(TicketType.class))).thenReturn(mockTicketType);
@@ -565,8 +580,7 @@ class TicketTypeServiceTest {
 
             // Then
             assertThat(result).isNotNull();
-            verify(ticketTypeRepository).save(argThat(ticketType ->
-                    ticketType.getIsActive()));
+            verify(ticketTypeRepository).save(argThat(TicketType::getIsActive));
         }
 
         @Test
@@ -583,8 +597,7 @@ class TicketTypeServiceTest {
 
             // Then
             assertThat(result).isNotNull();
-            verify(ticketTypeRepository).save(argThat(ticketType ->
-                    ticketType.getIsActive()));
+            verify(ticketTypeRepository).save(argThat(TicketType::getIsActive));
         }
     }
 
@@ -674,12 +687,12 @@ class TicketTypeServiceTest {
 
             // Then
             assertThat(result).isNotNull();
-            assertThat(result.totalTicketTypes()).isEqualTo(0L);
-            assertThat(result.activeTicketTypes()).isEqualTo(0L);
-            assertThat(result.soldOutTicketTypes()).isEqualTo(0L);
-            assertThat(result.totalCapacity()).isEqualTo(0);
-            assertThat(result.totalSold()).isEqualTo(0);
-            assertThat(result.totalRemaining()).isEqualTo(0);
+            assertThat(result.totalTicketTypes()).isZero();
+            assertThat(result.activeTicketTypes()).isZero();
+            assertThat(result.soldOutTicketTypes()).isZero();
+            assertThat(result.totalCapacity()).isZero();
+            assertThat(result.totalSold()).isZero();
+            assertThat(result.totalRemaining()).isZero();
             assertThat(result.totalRevenue()).isEqualTo(BigDecimal.ZERO);
             assertThat(result.averagePrice()).isEqualTo(0.0);
             assertThat(result.sellThroughRate()).isEqualTo(0.0);
@@ -805,7 +818,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     LocalDateTime.now().plusDays(29),
                     10, // minQuantity > maxQuantity
-                    5   // maxQuantity
+                    5,   // maxQuantity
+                    null // categoryId
             )).isInstanceOf(BusinessException.class)
               .hasMessage("Minimum quantity cannot be greater than maximum quantity");
         }
@@ -825,7 +839,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(10), // saleStart after saleEnd
                     LocalDateTime.now().plusDays(5),  // saleEnd
                     1,
-                    10
+                    10,   // maxQuantity
+                    null // categoryId
             )).isInstanceOf(BusinessException.class)
               .hasMessage("Sale start date cannot be after sale end date");
         }
@@ -845,7 +860,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     LocalDateTime.now().plusDays(29),
                     1,
-                    10
+                    10,   // maxQuantity
+                    null // categoryId
             )).isInstanceOf(BusinessException.class)
               .hasMessage("Available quantity cannot exceed capacity");
         }
@@ -865,7 +881,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     LocalDateTime.now().plusDays(29),
                     null, // minQuantity should default to 1
-                    null  // maxQuantity should default to 10
+                    null,  // maxQuantity should default to 10
+                    null // categoryId
             );
 
             // Then
@@ -889,7 +906,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     LocalDateTime.now().plusDays(29),
                     5, // minQuantity == maxQuantity
-                    5  // maxQuantity
+                    5,  // maxQuantity
+                    null // categoryId
             )).doesNotThrowAnyException();
         }
 
@@ -908,7 +926,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1),
                     LocalDateTime.now().plusDays(29),
                     1,
-                    10
+                    10,   // maxQuantity
+                    null // categoryId
             )).doesNotThrowAnyException();
         }
 
@@ -927,7 +946,8 @@ class TicketTypeServiceTest {
                     null, // saleStart
                     null, // saleEnd
                     1,
-                    10
+                    10,   // maxQuantity
+                    null // categoryId
             )).doesNotThrowAnyException();
         }
 
@@ -946,7 +966,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1), // saleStart
                     null, // saleEnd null
                     1,
-                    10
+                    10,   // maxQuantity
+                    null // categoryId
             )).doesNotThrowAnyException();
 
             assertThatCode(() -> new CreateTicketTypeRequest(
@@ -960,7 +981,8 @@ class TicketTypeServiceTest {
                     null, // saleStart null
                     LocalDateTime.now().plusDays(29), // saleEnd
                     1,
-                    10
+                    10,   // maxQuantity
+                    null // categoryId
             )).doesNotThrowAnyException();
         }
     }
@@ -1000,7 +1022,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(29), // saleEnd
                     1, // minQuantity
                     10, // maxQuantity
-                    true // isActive
+                    true, // isActive
+                    null
             );
             when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(mockTicketType));
             when(ticketTypeRepository.save(any(TicketType.class))).thenReturn(mockTicketType);
@@ -1028,7 +1051,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(29), // saleEnd
                     1, // minQuantity
                     10, // maxQuantity
-                    true // isActive
+                    true, // isActive
+                    null
             );
             when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(mockTicketType));
             when(ticketTypeRepository.save(any(TicketType.class))).thenReturn(mockTicketType);
@@ -1078,7 +1102,8 @@ class TicketTypeServiceTest {
                     LocalDateTime.now().plusDays(1), // saleStart
                     LocalDateTime.now().plusDays(29), // saleEnd
                     1, // minQuantity
-                    10 // maxQuantity
+                    10,   // maxQuantity
+                    null // categoryId
             );
 
             when(eventRepository.findById(1L)).thenReturn(Optional.of(mockEvent));
@@ -1173,7 +1198,8 @@ class TicketTypeServiceTest {
                     null,
                     null,
                     1, // minQuantity
-                    5 // maxQuantity
+                    5,   // maxQuantity
+                    null // categoryId
             );
             List<CreateTicketTypeRequest> requests = List.of(request1, request2);
 
@@ -1207,6 +1233,299 @@ class TicketTypeServiceTest {
             // Then
             assertThat(result).isNotNull();
             // In a real integration test, we would verify that no write operations are performed
+        }
+    }
+
+    @Nested
+    @DisplayName("Category Management Tests")
+    class CategoryManagementTests {
+
+        private TicketCategory mockCategory;
+
+        @BeforeEach
+        void setUpCategory() {
+            mockCategory = new TicketCategory();
+            mockCategory.setId(1L);
+            mockCategory.setEvent(mockEvent);
+            mockCategory.setName("VIP Category");
+        }
+
+        @Test
+        @DisplayName("Should create ticket type with category successfully")
+        void shouldCreateTicketTypeWithCategorySuccessfully() {
+            // Given
+            CreateTicketTypeRequest requestWithCategory = new CreateTicketTypeRequest(
+                    "VIP",
+                    "VIP Ticket",
+                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(10),
+                    1,
+                    100,
+                    100,
+                    LocalDateTime.now().plusDays(1),
+                    LocalDateTime.now().plusDays(29),
+                    1,
+                    10,
+                    1L // categoryId
+            );
+
+            when(eventRepository.findById(1L)).thenReturn(Optional.of(mockEvent));
+            when(ticketCategoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
+            when(ticketTypeMapper.toEntity(requestWithCategory)).thenReturn(mockTicketType);
+            when(ticketTypeRepository.save(any(TicketType.class))).thenReturn(mockTicketType);
+            when(ticketTypeMapper.toDTO(mockTicketType)).thenReturn(mockTicketTypeDTO);
+
+            // When
+            TicketTypeDTO result = ticketTypeService.createTicketType(1L, requestWithCategory);
+
+            // Then
+            assertThat(result).isNotNull();
+            verify(ticketCategoryRepository).findById(1L);
+            verify(ticketTypeRepository).save(argThat(ticketType ->
+                    ticketType.getCategory() != null && ticketType.getCategory().getId().equals(1L)));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when category not found")
+        void shouldThrowExceptionWhenCategoryNotFound() {
+            // Given
+            CreateTicketTypeRequest requestWithInvalidCategory = new CreateTicketTypeRequest(
+                    "VIP",
+                    "VIP Ticket",
+                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(10),
+                    1,
+                    100,
+                    100,
+                    LocalDateTime.now().plusDays(1),
+                    LocalDateTime.now().plusDays(29),
+                    1,
+                    10,
+                    999L // non-existent categoryId
+            );
+
+            when(eventRepository.findById(1L)).thenReturn(Optional.of(mockEvent));
+            when(ticketCategoryRepository.findById(999L)).thenReturn(Optional.empty());
+            when(ticketTypeMapper.toEntity(requestWithInvalidCategory)).thenReturn(mockTicketType);
+
+            // When & Then
+            assertThatThrownBy(() -> ticketTypeService.createTicketType(1L, requestWithInvalidCategory))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .hasMessage("Ticket category not found with ID: 999");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when category doesn't belong to event")
+        void shouldThrowExceptionWhenCategoryDoesntBelongToEvent() {
+            // Given
+            Event differentEvent = new Event();
+            differentEvent.setId(2L);
+
+            TicketCategory categoryFromDifferentEvent = new TicketCategory();
+            categoryFromDifferentEvent.setId(1L);
+            categoryFromDifferentEvent.setEvent(differentEvent);
+
+            CreateTicketTypeRequest requestWithWrongCategory = new CreateTicketTypeRequest(
+                    "VIP",
+                    "VIP Ticket",
+                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(10),
+                    1,
+                    100,
+                    100,
+                    LocalDateTime.now().plusDays(1),
+                    LocalDateTime.now().plusDays(29),
+                    1,
+                    10,
+                    1L // categoryId from different event
+            );
+
+            when(eventRepository.findById(1L)).thenReturn(Optional.of(mockEvent));
+            when(ticketCategoryRepository.findById(1L)).thenReturn(Optional.of(categoryFromDifferentEvent));
+            when(ticketTypeMapper.toEntity(requestWithWrongCategory)).thenReturn(mockTicketType);
+
+            // When & Then
+            assertThatThrownBy(() -> ticketTypeService.createTicketType(1L, requestWithWrongCategory))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessage("Category does not belong to this event");
+        }
+
+        @Test
+        @DisplayName("Should get uncategorized ticket types successfully")
+        void shouldGetUncategorizedTicketTypesSuccessfully() {
+            // Given
+            TicketType uncategorizedTicketType = new TicketType();
+            uncategorizedTicketType.setId(1L);
+            uncategorizedTicketType.setCategory(null);
+
+            when(ticketTypeRepository.findUncategorizedByEventId(1L))
+                    .thenReturn(List.of(uncategorizedTicketType));
+            when(ticketTypeMapper.toDTOList(anyList()))
+                    .thenReturn(List.of(mockTicketTypeDTO));
+
+            // When
+            List<TicketTypeDTO> result = ticketTypeService.getUncategorizedTicketTypes(1L);
+
+            // Then
+            assertThat(result).hasSize(1);
+            verify(ticketTypeRepository).findUncategorizedByEventId(1L);
+        }
+
+        @Test
+        @DisplayName("Should return empty list when no uncategorized ticket types")
+        void shouldReturnEmptyListWhenNoUncategorizedTicketTypes() {
+            // Given
+            when(ticketTypeRepository.findUncategorizedByEventId(1L)).thenReturn(List.of());
+            when(ticketTypeMapper.toDTOList(List.of())).thenReturn(List.of());
+
+            // When
+            List<TicketTypeDTO> result = ticketTypeService.getUncategorizedTicketTypes(1L);
+
+            // Then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Should move ticket types to category successfully")
+        void shouldMoveTicketTypesToCategorySuccessfully() {
+            // Given
+            TicketType ticketType1 = new TicketType();
+            ticketType1.setId(1L);
+            ticketType1.setEvent(mockEvent);
+
+            TicketType ticketType2 = new TicketType();
+            ticketType2.setId(2L);
+            ticketType2.setEvent(mockEvent);
+
+            List<Long> ticketTypeIds = List.of(1L, 2L);
+
+            when(ticketCategoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
+            when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(ticketType1));
+            when(ticketTypeRepository.findById(2L)).thenReturn(Optional.of(ticketType2));
+            when(ticketTypeRepository.saveAll(anyList())).thenReturn(List.of(ticketType1, ticketType2));
+            when(ticketTypeMapper.toDTOList(anyList())).thenReturn(List.of(mockTicketTypeDTO, mockTicketTypeDTO));
+
+            // When
+            List<TicketTypeDTO> result = ticketTypeService.moveTicketTypesToCategory(ticketTypeIds, 1L);
+
+            // Then
+            assertThat(result).hasSize(2);
+            verify(ticketTypeRepository).saveAll(argThat(ticketTypes -> {
+                List<TicketType> list = (List<TicketType>) ticketTypes;
+                return list.stream().allMatch(tt -> tt.getCategory() != null && tt.getCategory().getId().equals(1L));
+            }));
+        }
+
+        @Test
+        @DisplayName("Should move ticket types to null category (uncategorize)")
+        void shouldMoveTicketTypesToNullCategory() {
+            // Given
+            TicketType ticketType1 = new TicketType();
+            ticketType1.setId(1L);
+            ticketType1.setEvent(mockEvent);
+            ticketType1.setCategory(mockCategory);
+
+            List<Long> ticketTypeIds = List.of(1L);
+
+            when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(ticketType1));
+            when(ticketTypeRepository.saveAll(anyList())).thenReturn(List.of(ticketType1));
+            when(ticketTypeMapper.toDTOList(anyList())).thenReturn(List.of(mockTicketTypeDTO));
+
+            // When
+            List<TicketTypeDTO> result = ticketTypeService.moveTicketTypesToCategory(ticketTypeIds, null);
+
+            // Then
+            assertThat(result).hasSize(1);
+            verify(ticketTypeRepository).saveAll(argThat(ticketTypes -> {
+                List<TicketType> list = (List<TicketType>) ticketTypes;
+                return list.stream().allMatch(tt -> tt.getCategory() == null);
+            }));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when ticket type not found in move operation")
+        void shouldThrowExceptionWhenTicketTypeNotFoundInMoveOperation() {
+            // Given
+            TicketCategory category = new TicketCategory();
+            category.setId(1L);
+            category.setEvent(mockEvent);
+
+            List<Long> ticketTypeIds = List.of(1L, 999L); // Mix of existing and non-existing
+
+            TicketType existingTicketType = new TicketType();
+            existingTicketType.setId(1L);
+            existingTicketType.setEvent(mockEvent);
+
+            when(ticketCategoryRepository.findById(1L)).thenReturn(Optional.of(category));
+            when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(existingTicketType));
+            when(ticketTypeRepository.findById(999L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> ticketTypeService.moveTicketTypesToCategory(ticketTypeIds, 1L))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .hasMessage("Ticket type not found with ID: 999");
+
+            // Verify that category was found but operation failed on missing ticket type
+            verify(ticketCategoryRepository).findById(1L);
+            verify(ticketTypeRepository).findById(1L);
+            verify(ticketTypeRepository).findById(999L);
+            verify(ticketTypeRepository, never()).saveAll(any());
+        }
+
+        @Test
+        @DisplayName("Should throw exception when category not found in move operation")
+        void shouldThrowExceptionWhenCategoryNotFoundInMoveOperation() {
+            // Given
+            TicketType ticketType1 = new TicketType();
+            ticketType1.setId(1L);
+            ticketType1.setEvent(mockEvent);
+
+            List<Long> ticketTypeIds = List.of(1L);
+
+            when(ticketCategoryRepository.findById(999L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> ticketTypeService.moveTicketTypesToCategory(ticketTypeIds, 999L))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .hasMessage("Ticket category not found with ID: 999");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when ticket type doesn't belong to same event as category")
+        void shouldThrowExceptionWhenTicketTypeDoesntBelongToSameEventAsCategory() {
+            // Given
+            Event differentEvent = new Event();
+            differentEvent.setId(2L);
+
+            TicketType ticketTypeFromDifferentEvent = new TicketType();
+            ticketTypeFromDifferentEvent.setId(1L);
+            ticketTypeFromDifferentEvent.setEvent(differentEvent);
+
+            List<Long> ticketTypeIds = List.of(1L);
+
+            when(ticketCategoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
+            when(ticketTypeRepository.findById(1L)).thenReturn(Optional.of(ticketTypeFromDifferentEvent));
+
+            // When & Then
+            assertThatThrownBy(() -> ticketTypeService.moveTicketTypesToCategory(ticketTypeIds, 1L))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessage("Ticket type 1 does not belong to the same event as the category");
+        }
+
+        @Test
+        @DisplayName("Should handle empty ticket type list in move operation")
+        void shouldHandleEmptyTicketTypeListInMoveOperation() {
+            // Given
+            List<Long> emptyTicketTypeIds = List.of();
+
+            when(ticketTypeRepository.saveAll(List.of())).thenReturn(List.of());
+            when(ticketTypeMapper.toDTOList(List.of())).thenReturn(List.of());
+
+            // When
+            List<TicketTypeDTO> result = ticketTypeService.moveTicketTypesToCategory(emptyTicketTypeIds, null);
+
+            // Then
+            assertThat(result).isEmpty();
         }
     }
 }

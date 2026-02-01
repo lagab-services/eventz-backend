@@ -48,7 +48,9 @@ public record CreateTicketTypeRequest(
         Integer minQuantity,
 
         @Min(value = 1, message = "Maximum quantity must be at least 1")
-        Integer maxQuantity
+        Integer maxQuantity,
+        
+        Long categoryId
 ) {
     public CreateTicketTypeRequest {
         // Custom validation

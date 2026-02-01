@@ -88,7 +88,6 @@ public class EmailService {
             templateModel.put("validationLink", validationLink);
             templateModel.put("name", user.getFullName());
             templateModel.put("logo", logoUrl);
-            templateModel.put("locale", locale.getLanguage());
 
             // Create Thymeleaf context
             Context context = new Context(locale, templateModel);

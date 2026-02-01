@@ -10,13 +10,13 @@ public record TicketTypeDTO(
         @Schema(description = "Unique identifier of the ticket type", example = "123")
         Long id,
 
-        @Schema(description = "Name of the ticket type", example = "VIP Pass", required = true)
+        @Schema(description = "Name of the ticket type", example = "VIP Pass")
         String name,
 
         @Schema(description = "Description of the ticket type", example = "Access to VIP lounge and premium seating")
         String description,
 
-        @Schema(description = "Price of the ticket", example = "199.99", required = true)
+        @Schema(description = "Price of the ticket", example = "199.99")
         BigDecimal price,
 
         @Schema(description = "Number of tickets available for purchase", example = "100")
@@ -42,6 +42,13 @@ public record TicketTypeDTO(
 
         @Schema(description = "DEPRECATED - Use quantityRemaining instead")
         Integer remainingTickets,
+
+        // Category information
+        @Schema(description = "ID of the category this ticket type belongs to", example = "456")
+        Long categoryId,
+
+        @Schema(description = "Name of the category this ticket type belongs to", example = "VIP")
+        String categoryName,
 
         // Computed fields
         @Schema(description = "Calculated number of tickets remaining (quantityAvailable - quantitySold)", example = "50")

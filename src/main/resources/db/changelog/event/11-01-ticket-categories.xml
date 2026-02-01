@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd" objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1754934727319-1" author="lagab">
+        <createTable tableName="ticket_categories">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_ticket_categories"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="display_order" type="INT"/>
+            <column name="is_active" type="BOOLEAN"/>
+            <column name="is_collapsed" type="BOOLEAN"/>
+            <column name="event_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1754934727319-2" author="lagab">
+        <addForeignKeyConstraint baseColumnNames="event_id" baseTableName="ticket_categories" constraintName="FK_TICKET_CATEGORIES_ON_EVENT"
+                                 referencedColumnNames="id" referencedTableName="events"/>
+    </changeSet>
+    <changeSet id="add-category-id-to-ticket-types" author="lagab">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ticket_types" columnName="category_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ticket_types">
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="fk-tickets-type-category" author="lagab">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK_TICKETTYPES_ON_TICKETCATEGORY"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="ticket_types"
+                baseColumnNames="category_id"
+                constraintName="FK_TICKETTYPES_ON_TICKETCATEGORY"
+                referencedTableName="ticket_categories"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

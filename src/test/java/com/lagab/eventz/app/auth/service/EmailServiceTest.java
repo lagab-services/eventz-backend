@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -31,7 +30,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,10 +52,10 @@ class EmailServiceTest {
     private EmailService emailService;
 
     private User testUser;
-    private final String TEST_TOKEN = "test-token-123";
-    private final String FRONTEND_URL = "https://frontend.test.com";
-    private final String LOGO_URL = "https://logo.test.com/logo.png";
-    private final String FROM_EMAIL = "noreply@test.com";
+    private static final String TEST_TOKEN = "test-token-123";
+    private static final String FRONTEND_URL = "https://frontend.test.com";
+    private static final String LOGO_URL = "https://logo.test.com/logo.png";
+    private static final String FROM_EMAIL = "noreply@test.com";
 
     @BeforeEach
     void setUp() {
@@ -250,7 +248,6 @@ class EmailServiceTest {
     void testSendHtmlEmail_Success() throws Exception {
         // Mock configuration
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        MimeMessageHelper mockHelper = mock(MimeMessageHelper.class);
 
         // Using reflection to test private method
         invokePrivateMethodVoid("sendHtmlEmail", "test@example.com", "Test Subject", "<html>Test Content</html>");
@@ -290,14 +287,12 @@ class EmailServiceTest {
             Object validationLink = context.getVariable("validationLink");
             Object name = context.getVariable("name");
             Object logo = context.getVariable("logo");
-            Object locale = context.getVariable("locale");
 
             return validationLink != null &&
                     validationLink.toString().contains(FRONTEND_URL) &&
                     validationLink.toString().contains(TEST_TOKEN) &&
                     name != null &&
-                    logo != null &&
-                    locale != null;
+                    logo != null;
         }));
     }
 

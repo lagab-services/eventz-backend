@@ -15,6 +15,19 @@
 					"item": [
 						{
 							"name": "Register",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.collectionVariables.set(\"auth_token\", jsonData.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [
@@ -25,7 +38,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"first name\",\n  \"lastName\": \"Last Name\"\n}"
+									"raw": "{\n  \"email\": \"contact.lagabservices@gmail.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Ladislas\",\n  \"lastName\": \"Gabriel\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/auth/register",
@@ -151,7 +164,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+									"raw": "{\n  \"email\": \"contact.lagabservices@gmail.com\",\n  \"password\": \"password123\"\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/auth/login",
@@ -2495,6 +2508,151 @@
 							"response": []
 						},
 						{
+							"name": "Get ticket overview",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/overview",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"overview"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get public ticket information",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/public",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"public"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/categories",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"categories"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get active categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-types/event/:eventId/categories/active",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-types",
+										"event",
+										":eventId",
+										"categories",
+										"active"
+									],
+									"variable": [
+										{
+											"key": "eventId",
+											"value": "{{eventId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Get Active Ticket Types By Event ID",
 							"request": {
 								"method": "GET",
@@ -2647,7 +2805,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"Standard Ticket\",\n  \"description\": \"Ticket d'entrée standard\",\n  \"price\": 25.00,\n  \"quantityAvailable\":200,\n  \"maxQuantity\": 100,\n  \"saleStartDate\": \"2024-01-15T10:00:00\",\n  \"saleEndDate\": \"2024-03-15T23:59:59\",\n  \"active\": true\n}"
+									"raw": "{\n  \"name\": \"Standard Ticket\",\n  \"description\": \"Ticket d'entrée standard\",\n  \"price\": 25.00,\n  \"quantityAvailable\":200,\n  \"maxQuantity\": 100,\n  \"saleStartDate\": \"2024-01-15T10:00:00\",\n  \"saleEndDate\": \"2024-03-15T23:59:59\",\n  \"active\": true,\n  \"categoryId\": 1\n}"
 								},
 								"url": {
 									"raw": "{{base_url_version}}/ticket-types/event/{{eventId}}",
@@ -2752,7 +2910,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"Premium Ticket\",\n  \"description\": \"Ticket premium avec avantages exclusifs\",\n  \"price\": 35.00,\n  \"maxQuantity\": 80,\n  \"saleStartDate\": \"2024-01-15T10:00:00\",\n  \"saleEndDate\": \"2024-03-15T23:59:59\",\n  \"active\": true\n}"
+									"raw": "{\n  \"name\": \"Premium Ticket\",\n  \"description\": \"Ticket premium avec avantages exclusifs\",\n  \"price\": 35.00,\n  \"quantityAvailable\": 0,\n  \"saleStartDate\": \"2024-01-15T10:00:00\",\n  \"saleEndDate\": \"2024-03-15T23:59:59\",\n  \"active\": true\n}"
 								},
 								"url": {
 									"raw": "{{base_url_version}}/ticket-types/:id",
@@ -2889,6 +3047,405 @@
 										{
 											"key": "id",
 											"value": "{{ticketTypeId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "8.2 Ticket Category Management",
+					"item": [
+						{
+							"name": "Get a ticket category by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketCategoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all ticket categories for an event",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get active ticket categories for an event",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}/active",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}",
+										"active"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create new ticket category",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status 201 Created\", function() {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Correct response structure\", function() {",
+											"    pm.expect(jsonData).to.have.property('id');",
+											"    pm.expect(jsonData).to.have.property('title');",
+											"    pm.expect(jsonData).to.have.property('createdAt');",
+											"});",
+											"",
+											"if (jsonData && jsonData.id) {",
+											"    pm.collectionVariables.set(\"ticketTypeId\", jsonData.id);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Early Birds\",\n  \"description\": \"tickets d'ouverture\",\n  \"displayOrder\":1,\n  \"isActive\": true,\n  \"isCollapsed\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a ticket category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Early Birds VIP\",\n  \"description\": \"tickets a edition limitée\",\n  \"displayOrder\":2,\n  \"isActive\": false,\n  \"isCollapsed\": false\n}"
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketCategoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a ticket category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}/:id",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketCategoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enable/Disable a ticket category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}/:id/toggle-active",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}",
+										":id",
+										"toggle-active"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketCategoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Collapse/Expand a ticket category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}/:id/toggle-collapse",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}",
+										":id",
+										"toggle-collapse"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketCategoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reorder ticket categories",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[1,2]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/{{eventId}}/reorder",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										"{{eventId}}",
+										"reorder"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Move ticket types to a category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "X-Current-Org",
+										"value": "{{organizationId}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[3,2,1]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url_version}}/ticket-categories/event/:id/reorder",
+									"host": [
+										"{{base_url_version}}"
+									],
+									"path": [
+										"ticket-categories",
+										"event",
+										":id",
+										"reorder"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{ticketCategoryId}}"
 										}
 									]
 								}
@@ -3163,15 +3720,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Soirée Networking Lille - Édition Spéciale\",\n    \"description\": \"Un événement exceptionnel pour les pros du digital.\",\n    \"summary\": \"Networking + Conférences\",\n    \"startDate\": \"2025-07-14T18:00:00\",\n    \"endDate\": \"2025-08-01T23:59:00\",\n    \"registrationStart\": \"2025-07-01T00:00:00\",\n    \"registrationEnd\": \"2025-07-31T23:59:59\",\n    \"status\": \"DRAFT\",\n    \"type\": \"FESTIVAL\",\n    \"imageUrl\": \"https://example.com/newimage.png\",\n    \"website\": \"https://www.monevent.fr\",\n    \"maxAttendees\": 200,\n    \"isPublic\": true,\n    \"isFree\": true,\n    \"currency\": \"EUR\",\n    \"address\": {\n        \"address1\": \"456 Avenue des Champs\",\n        \"city\": \"Lille\",\n        \"postalCode\": \"59000\",\n        \"country\": \"France\"\n    }\n}"
+							"raw": "{\n    \"name\": \"Soirée Networking Lille - Édition Spéciale\",\n    \"description\": \"Un événement exceptionnel pour les pros du digital.\",\n    \"summary\": \"Networking + Conférences\",\n    \"startDate\": \"2025-08-14T18:00:00\",\n    \"endDate\": \"2025-09-01T23:59:00\",\n    \"registrationStart\": \"2025-08-01T00:00:00\",\n    \"registrationEnd\": \"2025-08-31T23:59:59\",\n    \"status\": \"DRAFT\",\n    \"type\": \"FESTIVAL\",\n    \"imageUrl\": \"https://example.com/newimage.png\",\n    \"website\": \"https://www.monevent.fr\",\n    \"maxAttendees\": 200,\n    \"isPublic\": true,\n    \"isFree\": true,\n    \"currency\": \"EUR\",\n    \"address\": {\n        \"address1\": \"456 Avenue des Champs\",\n        \"city\": \"Lille\",\n        \"postalCode\": \"59000\",\n        \"country\": \"France\"\n    }\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/v1/events",
+							"raw": "{{base_url}}/v1/organizations/{{organizationId}}/events",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"v1",
+								"organizations",
+								"{{organizationId}}",
 								"events"
 							]
 						}
@@ -3202,11 +3761,13 @@
 							"raw": "{\n  \"name\": \"Updated Event\",\n  \"description\": \"Updated description\",\n  \"startDate\": \"2025-07-16T18:00:00\",\n  \"endDate\": \"2025-07-16T21:00:00\",\n  \"location\": \"Lyon\",\n  \"type\": \"WORKSHOP\",\n  \"isFree\": false\n}"
 						},
 						"url": {
-							"raw": "{{base_url_version}}/events/:id",
+							"raw": "{{base_url_version}}/organizations/{{organizationId}}/events/:id",
 							"host": [
 								"{{base_url_version}}"
 							],
 							"path": [
+								"organizations",
+								"{{organizationId}}",
 								"events",
 								":id"
 							],
@@ -3240,11 +3801,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url_version}}/events/:id/publish",
+							"raw": "{{base_url_version}}/organizations/{{organizationId}}/events/:id/publish",
 							"host": [
 								"{{base_url_version}}"
 							],
 							"path": [
+								"organizations",
+								"{{organizationId}}",
 								"events",
 								":id",
 								"publish"
@@ -3279,11 +3842,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url_version}}/events/:id/cancel",
+							"raw": "{{base_url_version}}/organizations/{{organizationId}}/events/:id/cancel",
 							"host": [
 								"{{base_url_version}}"
 							],
 							"path": [
+								"organizations",
+								"{{organizationId}}",
 								"events",
 								":id",
 								"cancel"
@@ -3314,12 +3879,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/event/:id",
+							"raw": "{{base_url_version}}/organizations/{{organizationId}}/events/:id",
 							"host": [
-								"{{base_url}}"
+								"{{base_url_version}}"
 							],
 							"path": [
-								"event",
+								"organizations",
+								"{{organizationId}}",
+								"events",
 								":id"
 							],
 							"variable": [
@@ -3943,6 +4510,11 @@
 		{
 			"key": "ticketTypeId",
 			"value": ""
+		},
+		{
+			"key": "ticketCategoryId",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

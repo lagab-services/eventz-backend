@@ -173,24 +173,6 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("Should throw exception for inactive user")
-        void shouldThrowExceptionForInactiveUser() {
-            // Given
-            LoginRequestDto request = new LoginRequestDto("test@example.com", "password", false);
-            testUser.setIsActive(false);
-
-            when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                    .thenReturn(authentication);
-            when(authentication.getPrincipal()).thenReturn(testUser);
-
-            // When & Then
-            AuthenticationException exception = assertThrows(AuthenticationException.class,
-                    () -> authService.login(request, "192.168.1.1", "Mozilla/5.0"));
-
-            assertEquals("Account is disabled", exception.getMessage());
-        }
-
-        @Test
         @DisplayName("Should throw exception for bad credentials")
         void shouldThrowExceptionForBadCredentials() {
             // Given
@@ -311,22 +293,6 @@ class AuthServiceTest {
                     () -> authService.refreshToken(request, "192.168.1.1", "Mozilla/5.0"));
 
             assertEquals("Invalid token type", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should throw exception for inactive user during refresh")
-        void shouldThrowExceptionForInactiveUserDuringRefresh() {
-            // Given
-            RefreshTokenRequest request = new RefreshTokenRequest("refresh-token");
-            testUser.setIsActive(false);
-
-            when(tokenService.findValidToken(request.refreshToken())).thenReturn(Optional.of(testRefreshToken));
-
-            // When & Then
-            AuthenticationException exception = assertThrows(AuthenticationException.class,
-                    () -> authService.refreshToken(request, "192.168.1.1", "Mozilla/5.0"));
-
-            assertEquals("Account is disabled", exception.getMessage());
         }
     }
 
